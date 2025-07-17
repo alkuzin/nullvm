@@ -4,7 +4,7 @@
 # Project package info section.
 [package]
 name        = "nullvm_service"
-version     = "0.0.0"
+version     = "0.0.1"
 description = "NullVM hypervisor management service"
 authors     = ["Alexander Kuzin <alkuzindev@gmail.com>"]
 repository  = "https://github.com/alkuzin/nullvm"
