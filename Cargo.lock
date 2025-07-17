@@ -3,5 +3,9 @@
 version = 4
 
 [[package]]
+name = "nullvm-common"
+version = "0.0.0"
+
+[[package]]
 name = "nullvm-service"
 version = "0.0.0"

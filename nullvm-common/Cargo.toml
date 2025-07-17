@@ -3,9 +3,9 @@
 
 # Project package info section.
 [package]
-name        = "nullvm-service"
+name        = "nullvm-common"
 version     = "0.0.0"
-description = "NullVM hypervisor management service"
+description = "Common code across NullVM hypervisor project crates"
 authors     = ["Alexander Kuzin <alkuzindev@gmail.com>"]
 repository  = "https://github.com/alkuzin/nullvm"
 license     = "GPL-3"
