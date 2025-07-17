@@ -3,7 +3,7 @@
 
 # Project package info section.
 [package]
-name        = "nullvm-common"
+name        = "nullvm_common"
 version     = "0.0.0"
 description = "Common code across NullVM hypervisor project crates"
 authors     = ["Alexander Kuzin <alkuzindev@gmail.com>"]

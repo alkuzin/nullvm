@@ -9,6 +9,6 @@
 resolver = "3"
 # Packages to include in the workspace.
 members = [
-    "nullvm-service",
-    "nullvm-common",
+    "nullvm_service",
+    "nullvm_common",
 ]

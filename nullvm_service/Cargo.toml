@@ -3,7 +3,7 @@
 
 # Project package info section.
 [package]
-name        = "nullvm-service"
+name        = "nullvm_service"
 version     = "0.0.0"
 description = "NullVM hypervisor management service"
 authors     = ["Alexander Kuzin <alkuzindev@gmail.com>"]
@@ -13,6 +13,6 @@ edition     = "2024"
 
 # Project dependencies section.
 [dependencies]
-nullvm-common = { path = "../nullvm-common" }
+nullvm_common = { path = "../nullvm_common" }
 # Data & time library.
 chrono = "0.4.41"
