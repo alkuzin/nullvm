@@ -5,6 +5,7 @@
 
 pub(crate) use nullvm_common::log;
 pub mod cpu;
+pub mod vmm;
 
 fn main() {
     log::info!("Running NullVM hypervisor management service");
@@ -18,4 +19,8 @@ fn main() {
     }
 
     log::info!("This CPU support virtualization");
+
+    if let Err(error) = vmm::run() {
+        log::error!("Error: {error}")
+    }
 }

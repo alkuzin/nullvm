@@ -16,3 +16,5 @@ edition     = "2024"
 nullvm_common = { path = "../nullvm_common" }
 # Data & time library.
 chrono = "0.4.41"
+# Raw FFI bindings to platforms' system libraries.
+libc = "0.2"
