@@ -13,3 +13,5 @@ edition     = "2024"
 
 # Project dependencies section.
 [dependencies]
+# Data & time library.
+chrono = "0.4.41"

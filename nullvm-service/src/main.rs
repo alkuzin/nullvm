@@ -3,6 +3,8 @@
 
 //! NullVM hypervisor management service entry point.
 
+pub(crate) use nullvm_common::log;
+
 fn main() {
-    println!("Running NullVM service");
+    log::info!("Running NullVM hypervisor management service");
 }

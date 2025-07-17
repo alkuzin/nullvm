@@ -13,3 +13,6 @@ edition     = "2024"
 
 # Project dependencies section.
 [dependencies]
+nullvm-common = { path = "../nullvm-common" }
+# Data & time library.
+chrono = "0.4.41"
