@@ -3,8 +3,10 @@
 
 //! Virtual machine monitor main module.
 
-use std::fmt::{Debug, Display, Formatter};
-use std::{error::Error, io};
+use std::{
+    fmt::{Debug, Display, Formatter},
+    {error::Error, io},
+};
 
 pub mod vm;
 
@@ -25,9 +27,9 @@ pub enum VmmError {
 impl Display for VmmError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            VmmError::Custom(msg) => write!(f, "<custom>: {}", msg),
-            VmmError::Io(err) => write!(f, "<I/O>: {}", err),
-            VmmError::Kvm(err) => write!(f, "<KVM>: {}", err),
+            VmmError::Custom(msg) => write!(f, "<custom>: {msg}"),
+            VmmError::Io(err) => write!(f, "<I/O>: {err}"),
+            VmmError::Kvm(err) => write!(f, "<KVM>: {err}"),
         }
     }
 }
