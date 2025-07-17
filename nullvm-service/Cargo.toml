@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2025-present nullvm hypervisor project and contributors
+
+# Project package info section.
+[package]
+name        = "nullvm-service"
+version     = "0.0.0"
+description = "NullVM - KVM-based type 2 hypervisor for Linux"
+authors     = ["Alexander Kuzin <alkuzindev@gmail.com>"]
+repository  = "https://github.com/alkuzin/nullvm"
+license     = "GPL-3"
+edition     = "2024"
+
+# Project dependencies section.
+[dependencies]
