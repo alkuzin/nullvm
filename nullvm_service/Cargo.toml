@@ -18,3 +18,7 @@ nullvm_common = { path = "../nullvm_common" }
 chrono = "0.4.41"
 # Raw FFI bindings to platforms' system libraries.
 libc = "0.2"
+# FFI bindings to KVM.
+kvm-bindings = "0.13.0"
+# KVM API wrapper.
+kvm-ioctls = "0.23.0"

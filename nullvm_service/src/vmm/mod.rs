@@ -3,43 +3,60 @@
 
 //! Virtual machine monitor main module.
 
-use libc::c_int;
-use std::{
-    error::Error,
-    ffi::CString,
-    io,
-    os::fd::{FromRawFd, OwnedFd},
-};
+use std::fmt::{Debug, Display, Formatter};
+use std::{error::Error, io};
 
-pub mod kvm;
-mod vcpu;
 pub mod vm;
 
-/// VMM Result type wrapper.
-pub type VmmResult<T> = Result<T, Box<dyn Error>>;
+use kvm_ioctls::Error as KvmError;
 
-/// Create owned file descriptor from path.
-///
-/// # Parameters
-/// - `path`  - given file path to open.
-/// - `flags` - given file flags.
-///
-/// # Returns
-/// - `Owned file descriptor` - in case of success.
-/// - `Err` - otherwise.
-pub fn create_owned_fd(path: &str, flags: c_int) -> VmmResult<OwnedFd> {
-    let c_path =
-        CString::new(path).map_err(|e| Box::new(e) as Box<dyn Error>)?;
-
-    let fd = unsafe { libc::open(c_path.as_ptr(), flags) };
-
-    if fd < 0 {
-        return Err(Box::new(io::Error::last_os_error()));
-    }
-
-    let owned_fd = unsafe { OwnedFd::from_raw_fd(fd) };
-    Ok(owned_fd)
+/// VMM error enumeration.
+#[derive(Debug)]
+pub enum VmmError {
+    /// Custom error message.
+    Custom(String),
+    /// An I/O error.
+    Io(io::Error),
+    /// KVM specific error.
+    Kvm(KvmError),
 }
+
+/// Format VMM error.
+impl Display for VmmError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            VmmError::Custom(msg) => write!(f, "<custom>: {}", msg),
+            VmmError::Io(err) => write!(f, "<I/O>: {}", err),
+            VmmError::Kvm(err) => write!(f, "<KVM>: {}", err),
+        }
+    }
+}
+
+impl Error for VmmError {}
+
+/// Convert `String` to VMM error.
+impl From<String> for VmmError {
+    fn from(value: String) -> Self {
+        Self::Custom(value)
+    }
+}
+
+/// Convert I/O error to VMM error.
+impl From<io::Error> for VmmError {
+    fn from(value: io::Error) -> Self {
+        Self::Io(value)
+    }
+}
+
+/// Convert KVM error to VMM error.
+impl From<KvmError> for VmmError {
+    fn from(value: KvmError) -> Self {
+        Self::Kvm(value)
+    }
+}
+
+/// VMM Result type wrapper.
+pub type VmmResult<T> = Result<T, VmmError>;
 
 /// Initialize and run virtual machine monitor.
 ///

@@ -3,7 +3,8 @@
 
 //! Virtual machine related declarations.
 
-use crate::vmm::{VmmResult, kvm::Kvm};
+use crate::vmm::{VmmError, VmmResult};
+use kvm_ioctls::Kvm;
 
 /// Virtual machine info struct.
 pub struct VirtualMachine {
@@ -18,6 +19,11 @@ impl VirtualMachine {
     /// - New `VirtualMachine` object.
     pub fn new() -> VmmResult<Self> {
         let kvm = Kvm::new()?;
+        let version = kvm.get_api_version();
+
+        if version < 0 {
+            return Err(VmmError::from("Incorrect KVM API version".to_string()));
+        }
 
         let result = Self { kvm };
         Ok(result)
