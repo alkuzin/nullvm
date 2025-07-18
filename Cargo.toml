@@ -12,3 +12,14 @@ members = [
     "nullvm_service",
     "nullvm_common",
 ]
+
+# Shared dependencies across workspace crates.
+[workspace.dependencies]
+# Data & time library.
+chrono = "0.4.41"
+# Raw FFI bindings to platform's system libraries.
+libc = "0.2"
+# FFI bindings to KVM.
+kvm-bindings = "0.13.0"
+# KVM API wrapper.
+kvm-ioctls = "0.23.0"

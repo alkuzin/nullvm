@@ -15,10 +15,10 @@ edition     = "2024"
 [dependencies]
 nullvm_common = { path = "../nullvm_common" }
 # Data & time library.
-chrono = "0.4.41"
-# Raw FFI bindings to platforms' system libraries.
-libc = "0.2"
+chrono = { workspace = true }
+# Raw FFI bindings to platform's system libraries.
+libc = { workspace = true }
 # FFI bindings to KVM.
-kvm-bindings = "0.13.0"
+kvm-bindings = { workspace = true }
 # KVM API wrapper.
-kvm-ioctls = "0.23.0"
+kvm-ioctls = { workspace = true }
