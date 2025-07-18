@@ -4,6 +4,7 @@
 //! Virtual machine monitor common types declarations module.
 
 use crate::VmmError;
+use std::ffi::c_void;
 use std::{
     mem::ManuallyDrop,
     ops::{Deref, DerefMut},
@@ -11,6 +12,9 @@ use std::{
 
 /// VMM Result type wrapper.
 pub type VmmResult<T> = Result<T, VmmError>;
+
+/// Memory map syscall value wrapper.
+pub type MMapWrapper = ManualFree<*mut c_void, Box<dyn FnOnce(*mut c_void)>>;
 
 /// Value wrapper with manual cleanup.
 pub struct ManualFree<T, F: FnOnce(T)> {
