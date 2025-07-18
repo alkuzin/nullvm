@@ -3,4 +3,9 @@
 
 //! Project's common code main module.
 
+mod error;
 pub mod log;
+mod types;
+
+pub use error::*;
+pub use types::*;

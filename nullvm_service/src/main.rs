@@ -3,9 +3,10 @@
 
 //! NullVM hypervisor management service entry point.
 
-pub(crate) use nullvm_common::log;
 pub mod cpu;
 pub mod vmm;
+
+pub use nullvm_common::*;
 
 fn main() {
     log::info!("Running NullVM hypervisor management service");
