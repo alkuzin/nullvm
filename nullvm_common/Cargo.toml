@@ -19,3 +19,5 @@ chrono = { workspace = true }
 libc = { workspace = true }
 # KVM API wrapper.
 kvm-ioctls = { workspace = true }
+# Macro for declaring lazily evaluated statics.
+lazy_static = { workspace = true }

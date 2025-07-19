@@ -216,15 +216,24 @@ impl VirtualMachine {
 #[cfg(test)]
 pub mod tests {
     use super::*;
+    use crate::log::*;
+
+    fn setup() {
+        log::logger!("test_vm.log");
+    }
 
     #[test]
     fn test_create_vm() {
+        setup();
+
         let vm = VirtualMachine::new();
         assert!(vm.is_ok());
     }
 
     #[test]
     fn test_set_user_mem_region() {
+        setup();
+
         let mut vm = VirtualMachine::new().unwrap();
         let result = vm.set_user_mem_region(0x1000, 0x1000);
 
@@ -233,6 +242,8 @@ pub mod tests {
 
     #[test]
     fn test_set_user_mem_region_zero_mem_size() {
+        setup();
+
         let mut vm = VirtualMachine::new().unwrap();
         let result = vm.set_user_mem_region(0, 0);
 
@@ -241,6 +252,8 @@ pub mod tests {
 
     #[test]
     fn test_run_code() {
+        setup();
+
         const CODE: [u8; 12] = [
             0xba, 0xf8, 0x03, // mov $0x3f8, %dx
             0x00, 0xd8, // add %bl, %al

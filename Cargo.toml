@@ -23,3 +23,5 @@ libc = "0.2"
 kvm-bindings = "0.13.0"
 # KVM API wrapper.
 kvm-ioctls = "0.23.0"
+# Macro for declaring lazily evaluated statics.
+lazy_static = "1.5.0"

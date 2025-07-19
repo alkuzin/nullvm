@@ -4,8 +4,8 @@
 //! Virtual machine monitor common types declarations module.
 
 use crate::VmmError;
-use std::ffi::c_void;
 use std::{
+    ffi::c_void,
     mem::ManuallyDrop,
     ops::{Deref, DerefMut},
 };

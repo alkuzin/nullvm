@@ -8,4 +8,5 @@ pub mod log;
 mod types;
 
 pub use error::*;
+pub use log::*;
 pub use types::*;
