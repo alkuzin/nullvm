@@ -4,13 +4,18 @@
 //! Virtual machine related declarations.
 
 use crate::{VmmError, VmmResult};
-use kvm_bindings::{kvm_run, kvm_userspace_memory_region};
-use kvm_ioctls::{Kvm, VcpuFd, VmFd};
+use kvm_bindings::kvm_userspace_memory_region;
+use kvm_ioctls::{Kvm, VcpuExit, VcpuFd, VmFd};
 use libc::{
     MAP_ANONYMOUS, MAP_FAILED, MAP_SHARED, PROT_READ, PROT_WRITE, mmap, munmap,
 };
-use nullvm_common::MMapWrapper;
-use std::{ops::{Deref, DerefMut}, ptr, ptr::null_mut};
+use nullvm_common::{MMapWrapper, log};
+use std::{
+    io::Write,
+    ops::{Deref, DerefMut},
+    ptr,
+    ptr::null_mut,
+};
 
 /// Virtual machine info struct.
 pub struct VirtualMachine {
@@ -24,8 +29,6 @@ pub struct VirtualMachine {
     memory: Option<MMapWrapper>,
     /// VM's memory region info.
     mem_region: kvm_userspace_memory_region,
-    /// Virtual CPU state.
-    kvm_run: Option<MMapWrapper>,
 }
 
 impl VirtualMachine {
@@ -45,9 +48,7 @@ impl VirtualMachine {
         }
 
         let vmfd = kvm.create_vm()?;
-        let mut vcpu = vmfd.create_vcpu(0)?;
-
-        let kvm_run = vcpu.get_kvm_run();
+        let vcpu = vmfd.create_vcpu(0)?;
 
         let result = Self {
             kvm,
@@ -55,7 +56,6 @@ impl VirtualMachine {
             vcpu,
             memory: None,
             mem_region: Default::default(),
-            kvm_run: None,
         };
 
         Ok(result)
@@ -161,6 +161,56 @@ impl VirtualMachine {
 
         Err(VmmError::from("Error to load raw binary".to_string()))
     }
+
+    /// Run virtual machine.
+    ///
+    /// # Returns
+    /// - `Ok`  - in case of success.
+    /// - `Err` - otherwise.
+    pub fn run(&mut self) -> VmmResult<()> {
+        // Set up the initial states of these sets of standard & special registers.
+        let mut sregs = self.vcpu.get_sregs()?;
+        sregs.cs.base = 0;
+        sregs.cs.selector = 0;
+        self.vcpu.set_sregs(&sregs)?;
+
+        let mut regs = self.vcpu.get_regs()?;
+        regs.rip = 0x1000;
+        regs.rax = 4;
+        regs.rbx = 2;
+        regs.rflags = 2;
+        self.vcpu.set_regs(&regs)?;
+
+        loop {
+            let reason = self.vcpu.run()?;
+
+            match reason {
+                VcpuExit::IoOut(port, data) => {
+                    log::debug!("Out from port {port:#05X} to data {data:?}");
+
+                    // TODO: check in settings where to write (stdout or specified file).
+                    if port == 0x3f8 {
+                        std::io::stdout().write_all(data)?;
+                        std::io::stdout().flush()?;
+                    }
+                }
+                VcpuExit::Hlt => {
+                    log::debug!("Halt CPU");
+                }
+                VcpuExit::InternalError => {
+                    // TODO: add VmmError From<&str>.
+                    return Err(VmmError::from(
+                        "Internal error occurred".to_string(),
+                    ));
+                }
+                _ => {
+                    return Err(VmmError::from(format!(
+                        "Unhandled exit reason: {reason:#?}"
+                    )));
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -191,14 +241,14 @@ pub mod tests {
 
     #[test]
     fn test_run_code() {
-        const CODE: [u8;12] = [
+        const CODE: [u8; 12] = [
             0xba, 0xf8, 0x03, // mov $0x3f8, %dx
-            0x00, 0xd8,       // add %bl, %al
-            0x04, b'0',       // add $'0', %al
-            0xee,             // out %al, (%dx)
-            0xb0, b'\n',      // mov $'\n', %al
-            0xee,             // out %al, (%dx)
-            0xf4,             // hlt
+            0x00, 0xd8, // add %bl, %al
+            0x04, b'0', // add $'0', %al
+            0xee, // out %al, (%dx)
+            0xb0, b'\n', // mov $'\n', %al
+            0xee,  // out %al, (%dx)
+            0xf4,  // hlt
         ];
 
         let mut vm = VirtualMachine::new().unwrap();
@@ -207,6 +257,7 @@ pub mod tests {
         let result = vm.load_raw(&CODE);
         assert!(result.is_ok());
 
-        // TODO: run VM.
+        let result = vm.run();
+        log::test!("Result: {result:?}");
     }
 }
