@@ -41,6 +41,13 @@ impl From<String> for VmmError {
     }
 }
 
+/// Convert string slice to VMM error.
+impl From<&str> for VmmError {
+    fn from(value: &str) -> Self {
+        Self::Custom(value.to_string())
+    }
+}
+
 /// Convert I/O error to VMM error.
 impl From<io::Error> for VmmError {
     fn from(value: io::Error) -> Self {

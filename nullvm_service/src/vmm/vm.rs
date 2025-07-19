@@ -42,9 +42,7 @@ impl VirtualMachine {
         let version = kvm.get_api_version();
 
         if version < 0 {
-            return Err(VmmError::from(
-                "Incorrect KVM API version".to_string(),
-            ));
+            return Err(VmmError::from("Incorrect KVM API version"));
         }
 
         let vmfd = kvm.create_vm()?;
@@ -71,8 +69,7 @@ impl VirtualMachine {
     /// - `Err` - otherwise.
     fn set_vm_memory(&mut self, mem_size: usize) -> VmmResult<()> {
         if mem_size == 0 {
-            let msg = "Mapping memory size is zero".to_string();
-            return Err(VmmError::from(msg));
+            return Err(VmmError::from("Mapping memory size is zero"));
         }
 
         let addr = unsafe {
@@ -88,7 +85,7 @@ impl VirtualMachine {
             let addr = mmap(null_mut(), mem_size, prot, flags, -1, 0);
 
             if addr == MAP_FAILED {
-                return Err(VmmError::from("Failed to map memory".to_string()));
+                return Err(VmmError::from("Failed to map memory"));
             }
 
             addr
@@ -137,7 +134,7 @@ impl VirtualMachine {
             return Ok(());
         }
 
-        Err(VmmError::from("VM's memory wasn't set".to_string()))
+        Err(VmmError::from("VM's memory wasn't set"))
     }
 
     /// Load raw binary contents to VM's memory.
@@ -159,7 +156,7 @@ impl VirtualMachine {
             return Ok(());
         }
 
-        Err(VmmError::from("Error to load raw binary".to_string()))
+        Err(VmmError::from("Error to load raw binary"))
     }
 
     /// Run virtual machine.
@@ -188,7 +185,8 @@ impl VirtualMachine {
                 VcpuExit::IoOut(port, data) => {
                     log::debug!("Out from port {port:#05X} to data {data:?}");
 
-                    // TODO: check in settings where to write (stdout or specified file).
+                    // TODO: check in settings where to write
+                    // (stdout or specified file).
                     if port == 0x3f8 {
                         std::io::stdout().write_all(data)?;
                         std::io::stdout().flush()?;
@@ -198,15 +196,11 @@ impl VirtualMachine {
                     log::debug!("Halt CPU");
                 }
                 VcpuExit::InternalError => {
-                    // TODO: add VmmError From<&str>.
-                    return Err(VmmError::from(
-                        "Internal error occurred".to_string(),
-                    ));
+                    return Err(VmmError::from("Internal error occurred"));
                 }
                 _ => {
-                    return Err(VmmError::from(format!(
-                        "Unhandled exit reason: {reason:#?}"
-                    )));
+                    let error = format!("Unhandled exit reason: {reason:#?}");
+                    return Err(VmmError::from(error));
                 }
             }
         }
