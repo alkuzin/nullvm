@@ -175,35 +175,77 @@ impl VirtualMachine {
         regs.rip = 0x1000;
         regs.rax = 4;
         regs.rbx = 2;
-        regs.rflags = 2;
+        regs.rflags = 0x2;
         self.vcpu.set_regs(&regs)?;
 
         loop {
             let reason = self.vcpu.run()?;
+            log::debug!("Reason: {reason:?}");
 
             match reason {
-                VcpuExit::IoOut(port, data) => {
-                    log::debug!("Out from port {port:#05X} to data {data:?}");
-
-                    // TODO: check in settings where to write
-                    // (stdout or specified file).
-                    if port == 0x3f8 {
-                        std::io::stdout().write_all(data)?;
-                        std::io::stdout().flush()?;
-                    }
-                }
-                VcpuExit::Hlt => {
-                    log::debug!("Halt CPU");
-                }
-                VcpuExit::InternalError => {
-                    return Err(VmmError::from("Internal error occurred"));
-                }
-                _ => {
-                    let error = format!("Unhandled exit reason: {reason:#?}");
-                    return Err(VmmError::from(error));
-                }
+                VcpuExit::IoOut(port, data) => Self::handle_io_out(port, data)?,
+                VcpuExit::Hlt => return Self::handle_hlt(),
+                VcpuExit::InternalError => Self::handle_internal_error()?,
+                _ => Self::unhandled_exit(reason)?,
             }
         }
+    }
+
+    /// Handle data being sent to a I/O port.
+    ///
+    /// # Parameters
+    /// - `port` - given I/O port.
+    /// - `data` - given data to send.
+    ///
+    /// # Returns
+    /// - `Ok`  - in case of success.
+    /// - `Err` - otherwise.
+    fn handle_io_out(port: u16, data: &[u8]) -> VmmResult<()> {
+        log::debug!("Out from port {port:#05X} to data {data:?}");
+
+        // TODO: check in settings where to write
+        // (stdout or specified file).
+        if port == 0x3f8 {
+            std::io::stdout().write_all(data)?;
+            std::io::stdout().flush()?;
+        }
+        else {
+            return Err(VmmError::from("Unhandled I/O out port"));
+        }
+
+        Ok(())
+    }
+
+    /// Handle CPU halt.
+    ///
+    /// # Returns
+    /// - `Ok`  - in case of success.
+    /// - `Err` - otherwise.
+    fn handle_hlt() -> VmmResult<()> {
+        log::debug!("Halt CPU");
+        Ok(())
+    }
+
+    /// Handle internal error.
+    ///
+    /// # Returns
+    /// - `Ok`  - in case of success.
+    /// - `Err` - otherwise.
+    fn handle_internal_error() -> VmmResult<()> {
+        Err(VmmError::from("Internal error occurred"))
+    }
+
+    /// Handle unhandled VM exit reason.
+    ///
+    /// # Parameters
+    /// - `reason` - given unhandled VM exit reason.
+    ///
+    /// # Returns
+    /// - `Ok`  - in case of success.
+    /// - `Err` - otherwise.
+    fn unhandled_exit(reason: VcpuExit) -> VmmResult<()> {
+        let error = format!("Unhandled exit reason: {reason:#?}");
+        Err(VmmError::from(error))
     }
 }
 
@@ -265,6 +307,6 @@ pub mod tests {
         assert!(result.is_ok());
 
         let result = vm.run();
-        log::test!("Result: {result:?}");
+        assert!(result.is_ok());
     }
 }
