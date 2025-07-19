@@ -3,14 +3,14 @@
 
 //! Virtual machine related declarations.
 
-use crate::{ManualFree, VmmError, VmmResult};
-use kvm_bindings::kvm_userspace_memory_region;
+use crate::{VmmError, VmmResult};
+use kvm_bindings::{kvm_run, kvm_userspace_memory_region};
 use kvm_ioctls::{Kvm, VcpuFd, VmFd};
 use libc::{
     MAP_ANONYMOUS, MAP_FAILED, MAP_SHARED, PROT_READ, PROT_WRITE, mmap, munmap,
 };
 use nullvm_common::MMapWrapper;
-use std::{ops::Deref, ptr::null_mut};
+use std::{ops::{Deref, DerefMut}, ptr, ptr::null_mut};
 
 /// Virtual machine info struct.
 pub struct VirtualMachine {
@@ -24,6 +24,8 @@ pub struct VirtualMachine {
     memory: Option<MMapWrapper>,
     /// VM's memory region info.
     mem_region: kvm_userspace_memory_region,
+    /// Virtual CPU state.
+    kvm_run: Option<MMapWrapper>,
 }
 
 impl VirtualMachine {
@@ -43,7 +45,9 @@ impl VirtualMachine {
         }
 
         let vmfd = kvm.create_vm()?;
-        let vcpu = vmfd.create_vcpu(0)?;
+        let mut vcpu = vmfd.create_vcpu(0)?;
+
+        let kvm_run = vcpu.get_kvm_run();
 
         let result = Self {
             kvm,
@@ -51,6 +55,7 @@ impl VirtualMachine {
             vcpu,
             memory: None,
             mem_region: Default::default(),
+            kvm_run: None,
         };
 
         Ok(result)
@@ -134,6 +139,28 @@ impl VirtualMachine {
 
         Err(VmmError::from("VM's memory wasn't set".to_string()))
     }
+
+    /// Load raw binary contents to VM's memory.
+    ///
+    /// # Parameters
+    /// - `raw` - given raw binary bytes to load.
+    ///
+    /// # Returns
+    /// - `Ok`  - in case of success.
+    /// - `Err` - otherwise.
+    pub fn load_raw(&mut self, raw: &[u8]) -> VmmResult<()> {
+        if let Some(memory) = self.memory.as_mut() {
+            let addr = memory.deref_mut();
+
+            unsafe {
+                ptr::copy_nonoverlapping(raw.as_ptr(), addr.cast(), raw.len());
+            }
+
+            return Ok(());
+        }
+
+        Err(VmmError::from("Error to load raw binary".to_string()))
+    }
 }
 
 #[cfg(test)]
@@ -160,5 +187,26 @@ pub mod tests {
         let result = vm.set_user_mem_region(0, 0);
 
         assert!(result.is_err())
+    }
+
+    #[test]
+    fn test_run_code() {
+        const CODE: [u8;12] = [
+            0xba, 0xf8, 0x03, // mov $0x3f8, %dx
+            0x00, 0xd8,       // add %bl, %al
+            0x04, b'0',       // add $'0', %al
+            0xee,             // out %al, (%dx)
+            0xb0, b'\n',      // mov $'\n', %al
+            0xee,             // out %al, (%dx)
+            0xf4,             // hlt
+        ];
+
+        let mut vm = VirtualMachine::new().unwrap();
+        let _ = vm.set_user_mem_region(0x1000, 0x1000).unwrap();
+
+        let result = vm.load_raw(&CODE);
+        assert!(result.is_ok());
+
+        // TODO: run VM.
     }
 }
