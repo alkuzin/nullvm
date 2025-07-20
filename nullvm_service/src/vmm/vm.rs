@@ -131,6 +131,20 @@ impl VirtualMachine {
             }
 
             self.mem_region = mem_region;
+
+            // Set up the initial state of special registers.
+            let mut sregs = self.vcpu.get_sregs()?;
+            sregs.cs.base = 0;
+            sregs.cs.selector = 0;
+            self.vcpu.set_sregs(&sregs)?;
+
+            // Set up the initial state of standard registers.
+            let mut regs = self.vcpu.get_regs()?;
+            regs.rip = guest_paddr;
+            // Rflags bit 1 should always be set.
+            regs.rflags = 0x2;
+            self.vcpu.set_regs(&regs)?;
+
             return Ok(());
         }
 
@@ -165,19 +179,6 @@ impl VirtualMachine {
     /// - `Ok`  - in case of success.
     /// - `Err` - otherwise.
     pub fn run(&mut self) -> VmmResult<()> {
-        // Set up the initial states of these sets of standard & special registers.
-        let mut sregs = self.vcpu.get_sregs()?;
-        sregs.cs.base = 0;
-        sregs.cs.selector = 0;
-        self.vcpu.set_sregs(&sregs)?;
-
-        let mut regs = self.vcpu.get_regs()?;
-        regs.rip = 0x1000;
-        regs.rax = 4;
-        regs.rbx = 2;
-        regs.rflags = 0x2;
-        self.vcpu.set_regs(&regs)?;
-
         loop {
             let reason = self.vcpu.run()?;
             log::debug!("Reason: {reason:?}");
@@ -251,8 +252,8 @@ impl VirtualMachine {
 
 #[cfg(test)]
 pub mod tests {
-    use super::*;
     use crate::log::*;
+    use super::*;
 
     fn setup() {
         log::logger!("test_vm.log");
@@ -287,26 +288,67 @@ pub mod tests {
     }
 
     #[test]
-    fn test_run_code() {
+    fn test_run_code1() {
         setup();
 
+        // mov $0x3f8, %dx
+        // add %bl, %al
+        // add $'0', %al
+        // out %al, (%dx)
+        // mov $'\n', %al
+        // out %al, (%dx)
+        // hlt
         const CODE: [u8; 12] = [
-            0xba, 0xf8, 0x03, // mov $0x3f8, %dx
-            0x00, 0xd8, // add %bl, %al
-            0x04, b'0', // add $'0', %al
-            0xee, // out %al, (%dx)
-            0xb0, b'\n', // mov $'\n', %al
-            0xee,  // out %al, (%dx)
-            0xf4,  // hlt
+            0xba, 0xf8, 0x03, 0x00, 0xd8, 0x04, b'0', 0xee, 0xb0, b'\n',
+            0xee, 0xf4
         ];
 
         let mut vm = VirtualMachine::new().unwrap();
         let _ = vm.set_user_mem_region(0x1000, 0x1000).unwrap();
+
+        // Setting al, bl registers before testing code.
+        let mut regs = vm.vcpu.get_regs().unwrap();
+        regs.rax = 4;
+        regs.rbx = 2;
+        vm.vcpu.set_regs(&regs).unwrap();
 
         let result = vm.load_raw(&CODE);
         assert!(result.is_ok());
 
         let result = vm.run();
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_run_code2() {
+        setup();
+
+        // mov ax,0x42
+        // mov [ds:0x1000],ax
+        // hlt
+        const CODE: [u8; 8] = [0xb8, 0x42, 0x00, 0x3e, 0xa3, 0x00, 0x10, 0xf4];
+
+        let mut vm = VirtualMachine::new().unwrap();
+        let _ = vm.set_user_mem_region(0x0, 0x2000).unwrap();
+
+        let result = vm.load_raw(&CODE);
+        assert!(result.is_ok());
+
+        let result = vm.run();
+        assert!(result.is_ok());
+
+        let addr = vm.mem_region.userspace_addr;
+        let size = vm.mem_region.memory_size;
+        let mem_slice = unsafe {
+            std::slice::from_raw_parts(addr as * const u8, size as usize)
+        };
+
+        for (i, val) in mem_slice.iter().enumerate() {
+            if *val != 0 {
+                log::test!("({i}) val: {val:#04X}");
+            }
+        }
+
+        assert_eq!(mem_slice[0x1000] as i32, 0x42);
     }
 }
