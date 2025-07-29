@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.30.0)
 project(nullvm_service)
 
 # List of all source files.
-set(SOURCE_FILES src/main.cpp)
+set(SOURCE_FILES src/main.cpp src/cpu.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 # Add include directories to service.

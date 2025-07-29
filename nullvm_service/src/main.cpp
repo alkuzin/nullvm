@@ -3,13 +3,23 @@
 
 /// NullVM service entry point.
 
-#include <nullvm/types.hpp>
+#include <nullvm/service/cpu.hpp>
 #include <nullvm/log.hpp>
-#include <print>
 
 using namespace nullvm;
 
 auto main() -> i32 {
-    log::info("Running NullVM service");
+    log::info("Running NullVM hypervisor management service");
+    log::info("Detected CPU:");
+    log::info("CPU vendor: {}", service::get_cpu_vendor());
+    log::info("CPU brand: {}", service::get_cpu_brand());
+
+    if (!service::is_virtualization_supported()) {
+        log::error("This CPU doesn't support virtualization");
+        std::exit(EXIT_FAILURE);
+    }
+
+    log::info("This CPU support virtualization");
+
     return 0;
 }
