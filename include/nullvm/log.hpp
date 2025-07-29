@@ -31,7 +31,7 @@ namespace nullvm::log {
     /// @param [in] fmt given format string.
     /// @param [in] args given format string arguments.
     template<typename... Args>
-    void info(std::format_string<Args...> fmt, Args&&... args) {
+    auto info(std::format_string<Args...> fmt, Args&&... args) -> void {
         custom("INFO", fmt, std::forward<Args>(args)...);
     }
 
@@ -40,7 +40,7 @@ namespace nullvm::log {
     /// @param [in] fmt given format string.
     /// @param [in] args given format string arguments.
     template<typename... Args>
-    void debug(std::format_string<Args...> fmt, Args&&... args) {
+    auto debug(std::format_string<Args...> fmt, Args&&... args) -> void {
         custom("DEBUG", fmt, std::forward<Args>(args)...);
     }
 
@@ -49,7 +49,7 @@ namespace nullvm::log {
     /// @param [in] fmt given format string.
     /// @param [in] args given format string arguments.
     template<typename... Args>
-    void error(std::format_string<Args...> fmt, Args&&... args) {
+    auto error(std::format_string<Args...> fmt, Args&&... args) -> void {
         custom("ERROR", fmt, std::forward<Args>(args)...);
     }
 
@@ -58,7 +58,7 @@ namespace nullvm::log {
     /// @param [in] fmt given format string.
     /// @param [in] args given format string arguments.
     template<typename... Args>
-    void test(std::format_string<Args...> fmt, Args&&... args) {
+    auto test(std::format_string<Args...> fmt, Args&&... args) -> void {
         custom("TEST", fmt, std::forward<Args>(args)...);
     }
 
