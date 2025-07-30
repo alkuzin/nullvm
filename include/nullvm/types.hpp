@@ -6,7 +6,9 @@
 #ifndef NULLVM_TYPES_HPP
 #define NULLVM_TYPES_HPP
 
+#include <expected>
 #include <cstdint>
+#include <string>
 
 namespace nullvm {
 
@@ -28,6 +30,13 @@ namespace nullvm {
 
     // Size types aliases.
     using usize = std::size_t;
+
+    /// VMM error type.
+    using VmmError = std::string;
+
+    /// VMM expected values wrapper.
+    template <typename T>
+    using VmmResult = std::expected<T, VmmError>;
 
 }
 
