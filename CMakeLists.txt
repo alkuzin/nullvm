@@ -28,12 +28,21 @@ else()
     message(FATAL_ERROR "Boost libraries not found")
 endif()
 
+# Find GTest.
+find_package(GTest REQUIRED)
+
+if(GTest_FOUND)
+    include_directories(${GTest_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "GTest library not found")
+endif()
+
+enable_testing()
+
 # Compiler flags for different build types.
 set(COMMON_CXX_FLAGS "-Wall -Wextra -Werror -Wpedantic -Wconversion")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O3")
-
-enable_testing()
 
 # Project subdirectories.
 add_subdirectory(nullvm_core)
