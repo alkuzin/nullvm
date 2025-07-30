@@ -62,6 +62,16 @@ namespace nullvm::log {
         custom("TEST", fmt, std::forward<Args>(args)...);
     }
 
+    /// @brief Logs a panic message and terminates process.
+    ///
+    /// @param [in] fmt given format string.
+    /// @param [in] args given format string arguments.
+    template<typename... Args>
+    auto panic(std::format_string<Args...> fmt, Args&&... args) -> void {
+        custom("PANIC", fmt, std::forward<Args>(args)...);
+        std::exit(EXIT_FAILURE);
+    }
+
 }
 
 #endif // NULLVM_LOG_HPP
