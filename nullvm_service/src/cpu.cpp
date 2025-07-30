@@ -8,7 +8,10 @@
 
 namespace nullvm::service {
 
+    /// Size of CPU vendor ID in bytes.
     constexpr u8 CPUID_VENDOR_ID_SIZE {13};
+
+    /// Size of CPU brand in bytes.
     constexpr u8 CPUID_BRAND_SIZE {48};
 
     auto get_cpu_vendor() -> std::string {
