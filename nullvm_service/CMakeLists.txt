@@ -16,4 +16,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 # Link Boost to executable.
-target_link_libraries(${PROJECT_NAME} Boost::system)
+target_link_libraries(${PROJECT_NAME} Boost::system nullvm_core)
