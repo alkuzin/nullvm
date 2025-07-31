@@ -7,6 +7,7 @@
 #define NULLVM_TYPES_HPP
 
 #include <expected>
+#include <variant>
 #include <cstdint>
 #include <string>
 
@@ -37,6 +38,9 @@ namespace nullvm {
     /// VMM expected values wrapper.
     template <typename T>
     using VmmResult = std::expected<T, VmmError>;
+
+    /// Placeholder type for VmmResult.
+    using None = std::monostate;
 
 }
 
