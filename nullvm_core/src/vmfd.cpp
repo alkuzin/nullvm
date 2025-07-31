@@ -8,7 +8,7 @@
 
 namespace nullvm::core {
 
-    auto VmFd::create(const i32 raw) noexcept -> VmmResult<VmFd> {
+    auto VmFd::init(const i32 raw) noexcept -> VmmResult<None> {
         if (raw < 0) {
             const auto err = "Invalid file descriptor: must be non-negative";
             return std::unexpected(err);
@@ -20,12 +20,15 @@ namespace nullvm::core {
             return std::unexpected(err);
         }
 
-        return VmFd { .raw = raw };
+        this->raw = raw;
+        return None {};
     }
 
     VmFd::~VmFd() noexcept {
-        close(this->raw);
-        this->raw = -1;
+        if (this->raw != -1) {
+            close(this->raw);
+            this->raw = -1;
+        }
     }
 
 }

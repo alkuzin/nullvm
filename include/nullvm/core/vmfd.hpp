@@ -9,21 +9,25 @@
 #include <nullvm/types.hpp>
 
 namespace nullvm::core {
+
     /// Virtual machine file descriptor management struct.
     struct VmFd {
         /// Raw virtual machine file descriptor.
         i32 raw;
 
         /// @brief Construct new VmFd object.
-        ///
-        /// @param [in] raw given raw virtual machine file descriptor.
-        ///
-        /// @return New VmFd object in case of success.
-        /// @return VmmError otherwise.
-        static auto create(i32 raw) noexcept -> VmmResult<VmFd>;
+        VmFd() noexcept: raw(-1) {}
 
         /// @brief Destruct VmFd object.
         ~VmFd() noexcept;
+
+        /// @brief Initialize VmFd object.
+        ///
+        /// @param [in] raw given raw virtual machine file descriptor.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto init(i32 raw) noexcept -> VmmResult<None>;
     };
 
 }
