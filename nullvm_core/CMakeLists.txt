@@ -22,7 +22,7 @@ target_include_directories(${LIBRARY_NAME} PRIVATE
 enable_testing()
 
 set(TESTS_EXECUTABLE nullvm_core_tests)
-set(TESTS_SOURCE_FILES tests/test_vmfd.cpp)
+set(TESTS_SOURCE_FILES tests/test_vmfd.cpp tests/test_kvm.cpp)
 add_executable(${TESTS_EXECUTABLE} ${TESTS_SOURCE_FILES})
 
 # Link the GTest library to the test project.
