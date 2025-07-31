@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.30.0)
 project(nullvm_core)
 
 # List of all source files.
-set(SOURCE_FILES src/vmfd.cpp src/kvm.cpp)
+set(SOURCE_FILES src/cpu.cpp src/vmfd.cpp src/kvm.cpp)
 
 # Create a shared library.
 set(LIBRARY_NAME ${PROJECT_NAME})

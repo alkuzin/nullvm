@@ -3,11 +3,10 @@
 
 /// x86 CPU related declarations.
 
-#ifndef NULLVM_SERVICE_CPU_HPP
-#define NULLVM_SERVICE_CPU_HPP
+#ifndef NULLVM_CORE_CPU_HPP
+#define NULLVM_CORE_CPU_HPP
 
 #include <nullvm/types.hpp>
-#include <string>
 
 namespace nullvm::service {
 
@@ -57,4 +56,4 @@ namespace nullvm::service {
 
 }
 
-#endif // NULLVM_SERVICE_CPU_HPP
+#endif // NULLVM_CORE_CPU_HPP

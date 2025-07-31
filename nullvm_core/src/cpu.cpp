@@ -3,7 +3,7 @@
 
 /// x86 CPU related declarations.
 
-#include <nullvm/service/cpu.hpp>
+#include <nullvm/core/cpu.hpp>
 #include <cstring>
 
 namespace nullvm::service {

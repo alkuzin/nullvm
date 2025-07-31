@@ -3,7 +3,7 @@
 
 /// NullVM service entry point.
 
-#include <nullvm/service/cpu.hpp>
+#include <nullvm/core/cpu.hpp>
 #include <nullvm/log.hpp>
 
 using namespace nullvm;
