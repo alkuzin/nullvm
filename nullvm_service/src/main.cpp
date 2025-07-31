@@ -9,6 +9,10 @@
 using namespace nullvm;
 
 auto main() -> i32 {
+    log::info(
+        "Running {} v{} {}",
+        PROJECT_NAME, PROJECT_VERSION, PROJECT_DESCRIPTION
+    );
     log::info("Running NullVM hypervisor management service");
     log::info("Detected CPU:");
     log::info("CPU vendor: {}", service::get_cpu_vendor());

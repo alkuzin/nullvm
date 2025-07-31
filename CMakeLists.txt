@@ -4,7 +4,15 @@
 # Main CMake configuration file.
 
 cmake_minimum_required(VERSION 3.30.0)
-project(nullvm)
+project(nullvm
+        VERSION 0.0.1
+        DESCRIPTION "KVM-based type 2 hypervisor"
+)
+
+# Macros for project details.
+add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
+add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
+add_definitions(-DPROJECT_DESCRIPTION="${PROJECT_DESCRIPTION}")
 
 # Set the C++ compiler to Clang.
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
