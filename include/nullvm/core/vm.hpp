@@ -6,6 +6,7 @@
 #ifndef NULLVM_CORE_VM_HPP
 #define NULLVM_CORE_VM_HPP
 
+#include <nullvm/core/mmap_wrapper.hpp>
 #include <nullvm/core/kvm.hpp>
 
 namespace nullvm::core {
@@ -16,6 +17,8 @@ namespace nullvm::core {
         Kvm kvm;
         /// Virtual machine file descriptor.
         VmFd vmfd;
+        /// Memory allocated to VM.
+        MMapWrapper memory;
 
         /// @brief Construct new VirtualMachine object.
         VirtualMachine() noexcept = default;
@@ -25,6 +28,14 @@ namespace nullvm::core {
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
         auto init() noexcept -> VmmResult<None>;
+
+        /// @brief Set VM's memory.
+        ///
+        /// @param size given size of the memory region in bytes to allocate.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto set_vm_memory(const usize size) noexcept -> VmmResult<None>;
     };
 
 }
