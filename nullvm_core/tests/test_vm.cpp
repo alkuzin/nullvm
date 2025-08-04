@@ -14,3 +14,23 @@ TEST(test_vm, test_vm_creation_correct) {
 
     EXPECT_TRUE(result.has_value());
 }
+
+TEST(test_vm, test_vm_set_vm_memory_correct) {
+    VirtualMachine vm;
+
+    auto result = vm.init();
+    EXPECT_TRUE(result.has_value());
+
+    result = vm.set_vm_memory(0x1000);
+    EXPECT_TRUE(result.has_value());
+}
+
+TEST(test_vm, test_vm_set_vm_memory_incorrect_size) {
+    VirtualMachine vm;
+
+    auto result = vm.init();
+    EXPECT_TRUE(result.has_value());
+
+    result = vm.set_vm_memory(0);
+    EXPECT_FALSE(result.has_value());
+}
