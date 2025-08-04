@@ -2,6 +2,7 @@
 # Copyright (C) 2025-present nullvm project and contributors
 
 .vscode/
+.cache/
 .idea/
 build/
 docs/
