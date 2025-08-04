@@ -10,8 +10,12 @@
 namespace nullvm::core {
 
     auto MMapWrapper::init(void *addr, usize size) noexcept -> VmmResult<None> {
+
         if (!addr)
             return std::unexpected("Mapped memory address cannot be null");
+
+        if (addr == MAP_FAILED)
+            return std::unexpected("Incorrect memory address: MAP_FAILED");
 
         if (size == 0)
             return std::unexpected("Mapped data size cannot be 0");
