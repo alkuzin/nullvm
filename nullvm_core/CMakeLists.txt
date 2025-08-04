@@ -7,7 +7,12 @@ cmake_minimum_required(VERSION 3.30.0)
 project(nullvm_core)
 
 # List of all source files.
-set(SOURCE_FILES src/cpu.cpp src/vmfd.cpp src/kvm.cpp)
+set(SOURCE_FILES
+        src/cpu.cpp
+        src/vmfd.cpp
+        src/kvm.cpp
+        src/vm.cpp
+)
 
 # Create a shared library.
 set(LIBRARY_NAME ${PROJECT_NAME})
@@ -22,7 +27,12 @@ target_include_directories(${LIBRARY_NAME} PRIVATE
 enable_testing()
 
 set(TESTS_EXECUTABLE nullvm_core_tests)
-set(TESTS_SOURCE_FILES tests/test_vmfd.cpp tests/test_kvm.cpp)
+set(TESTS_SOURCE_FILES
+        tests/test_vmfd.cpp
+        tests/test_kvm.cpp
+        tests/test_vm.cpp
+)
+
 add_executable(${TESTS_EXECUTABLE} ${TESTS_SOURCE_FILES})
 
 # Link the GTest library to the test project.
