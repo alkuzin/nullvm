@@ -5,6 +5,7 @@
 
 #include <nullvm/core/vcpu.hpp>
 #include <linux/kvm.h>
+#include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <unistd.h>
 
@@ -29,6 +30,8 @@ namespace nullvm::core {
             );
         }
 
+        this->raw = raw;
+
         const auto prot = PROT_READ | PROT_WRITE;
         const auto addr = mmap(nullptr, size, prot, MAP_SHARED, raw, 0);
 
@@ -36,7 +39,10 @@ namespace nullvm::core {
             return std::unexpected(result.error());
         }
 
-        this->raw = raw;
+        if (auto result = this->set_registers(); !result) {
+            return std::unexpected(result.error());
+        }
+
         return None {};
     }
 
@@ -47,4 +53,58 @@ namespace nullvm::core {
         }
     }
 
+    auto VCpu::set_registers() noexcept -> VmmResult<None> {
+
+        if (auto result = this->get_sregs(); !result) {
+            return std::unexpected(result.error());
+        }
+
+        this->sregs.cs.base     = 0;
+        this->sregs.cs.selector = 0;
+
+        if (auto result = this->set_sregs(); !result) {
+            return std::unexpected(result.error());
+        }
+
+        this->regs.rflags = 0x2;
+
+        if (auto result = this->set_regs(); !result) {
+            return std::unexpected(result.error());
+        }
+
+        return None {};
+    }
+
+    auto VCpu::get_sregs() noexcept -> VmmResult<None> {
+
+        const auto ret = ioctl(this->raw, KVM_GET_SREGS, &this->sregs);
+
+        if (ret == -1) {
+            return std::unexpected("Error to get special registers state");
+        }
+
+        return None {};
+    }
+
+    auto VCpu::set_sregs() noexcept -> VmmResult<None> {
+
+        const auto ret = ioctl(this->raw, KVM_SET_SREGS, &this->sregs);
+
+        if (ret == -1) {
+            return std::unexpected("Error to set special registers state");
+        }
+
+        return None {};
+    }
+
+    auto VCpu::set_regs() noexcept -> VmmResult<None> {
+
+        const auto ret = ioctl(this->raw, KVM_SET_REGS, &this->regs);
+
+        if (ret == -1) {
+            return std::unexpected("Error to set standard registers state");
+        }
+
+        return None {};
+    }
 }

@@ -6,6 +6,7 @@
 #ifndef NULLVM_CORE_VCPU_HPP
 #define NULLVM_CORE_VCPU_HPP
 
+#include <asm/kvm.h>
 #include <nullvm/core/mmap_wrapper.hpp>
 #include <nullvm/types.hpp>
 #include <linux/kvm.h>
@@ -18,6 +19,10 @@ namespace nullvm::core {
         i32 raw;
         /// Virtual CPU state.
         MMapWrapper state;
+        /// Virtual CPU's special registers.
+        kvm_sregs sregs;
+        /// Virtual CPU's standard registers.
+        kvm_regs regs;
 
         /// @brief Construct new VCpu object.
         VCpu() noexcept: raw(-1) {}
@@ -33,6 +38,31 @@ namespace nullvm::core {
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
         auto init(i32 raw, usize size) noexcept -> VmmResult<None>;
+
+    private:
+        /// @brief Set initial register state of virtual CPU.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto set_registers() noexcept -> VmmResult<None>;
+
+        /// @brief Get special register state of virtual CPU.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto get_sregs() noexcept -> VmmResult<None>;
+
+        /// @brief Set special register state of virtual CPU.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto set_sregs() noexcept -> VmmResult<None>;
+
+        /// @brief Set standard register state of virtual CPU.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto set_regs() noexcept -> VmmResult<None>;
     };
 
 }

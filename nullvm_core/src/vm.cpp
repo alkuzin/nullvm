@@ -93,6 +93,8 @@ namespace nullvm::core {
             .userspace_addr = reinterpret_cast<u64>(this->memory.addr),
         };
 
+        this->vcpu.regs.rip = addr;
+
         const auto ret = ioctl(
             this->vmfd.raw,
             KVM_SET_USER_MEMORY_REGION,
@@ -117,4 +119,5 @@ namespace nullvm::core {
         std::memcpy(this->memory.addr, raw.data(), size);
         return None {};
     }
+
 }
