@@ -7,6 +7,7 @@
 #include <linux/kvm.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <cstring>
 
 namespace nullvm::core {
 
@@ -88,4 +89,15 @@ namespace nullvm::core {
         return None {};
     }
 
+    auto VirtualMachine::load_raw(const std::vector<u8>& raw) noexcept
+    -> VmmResult<None> {
+
+        const auto size = raw.size();
+
+        if (size == 0)
+            return std::unexpected("Raw binary size is zero");
+
+        std::memcpy(this->memory.addr, raw.data(), size);
+        return None {};
+    }
 }

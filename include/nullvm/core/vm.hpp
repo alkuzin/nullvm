@@ -8,6 +8,7 @@
 
 #include <nullvm/core/mmap_wrapper.hpp>
 #include <nullvm/core/kvm.hpp>
+#include <vector>
 
 namespace nullvm::core {
 
@@ -37,6 +38,14 @@ namespace nullvm::core {
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
         auto set_mem_region(u64 addr, usize size) noexcept -> VmmResult<None>;
+
+        /// @brief Load raw binary contents to VM's memory.
+        ///
+        /// @param raw given raw binary bytes to load.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto load_raw(const std::vector<u8>& raw) noexcept -> VmmResult<None>;
 
     private:
         /// @brief Set VM's memory.
