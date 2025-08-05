@@ -28,6 +28,12 @@ namespace nullvm::core {
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
         auto init(i32 raw) noexcept -> VmmResult<None>;
+
+        /// @brief Create virtual CPU.
+        ///
+        /// @return New virtual CPU file descriptor - in case of success.
+        /// @return VmmError - otherwise.
+        auto create_vcpu() const -> VmmResult<i32>;
     };
 
 }

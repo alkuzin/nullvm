@@ -4,6 +4,8 @@
 /// KVM virtual machine file descriptor handle.
 
 #include <nullvm/core/vmfd.hpp>
+#include <linux/kvm.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 
 namespace nullvm::core {
@@ -29,6 +31,15 @@ namespace nullvm::core {
             close(this->raw);
             this->raw = -1;
         }
+    }
+
+    auto VmFd::create_vcpu() const -> VmmResult<i32> {
+        const auto result = ioctl(this->raw, KVM_CREATE_VCPU, 0);
+
+        if (result == -1)
+            return std::unexpected("Error to create virtual CPU");
+
+        return result;
     }
 
 }
