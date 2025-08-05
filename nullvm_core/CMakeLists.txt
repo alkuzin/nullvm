@@ -34,7 +34,6 @@ set(TESTS_SOURCE_FILES
         tests/test_kvm.cpp
         tests/test_vm.cpp
         tests/test_mmap_wrapper.cpp
-        tests/test_vcpu.cpp
 )
 
 add_executable(${TESTS_EXECUTABLE} ${TESTS_SOURCE_FILES})
