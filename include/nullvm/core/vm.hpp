@@ -7,6 +7,7 @@
 #define NULLVM_CORE_VM_HPP
 
 #include <nullvm/core/mmap_wrapper.hpp>
+#include <nullvm/core/vcpu.hpp>
 #include <nullvm/core/kvm.hpp>
 #include <vector>
 
@@ -20,6 +21,8 @@ namespace nullvm::core {
         VmFd vmfd;
         /// Memory allocated to VM.
         MMapWrapper memory;
+        /// Virtual CPU handle.
+        VCpu vcpu;
 
         /// @brief Construct new VirtualMachine object.
         VirtualMachine() noexcept = default;

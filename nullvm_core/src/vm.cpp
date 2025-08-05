@@ -12,6 +12,7 @@
 namespace nullvm::core {
 
     auto VirtualMachine::init() noexcept -> VmmResult<None> {
+
         if (auto result = this->kvm.init(); !result) {
             return result;
         }
@@ -26,10 +27,26 @@ namespace nullvm::core {
             return std::unexpected(result.error());
         }
 
+        auto vcpu_result = this->vmfd.create_vcpu();
+
+        if (!vcpu_result) {
+            return std::unexpected(vcpu_result.error());
+        }
+
+        const auto vcpufd = vcpu_result.value();
+        const auto size = static_cast<usize>(
+            ioctl(this->kvm.raw, KVM_GET_VCPU_MMAP_SIZE, 0)
+        );
+
+        if (auto result = this->vcpu.init(vcpufd, size); !result) {
+            return std::unexpected(result.error());
+        }
+
         return None {};
     }
 
     auto VirtualMachine::set_vm_memory(usize size) noexcept -> VmmResult<None> {
+
         if (size == 0) {
             return std::unexpected(
                 "Error to set VM's memory: mapping memory size is zero"
