@@ -29,13 +29,23 @@ namespace nullvm::core {
         /// @return VmmError - otherwise.
         auto init() noexcept -> VmmResult<None>;
 
+        /// @brief Set userspace memory region.
+        ///
+        /// @param addr given guest's starting address.
+        /// @param size given size of the memory region in bytes.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto set_mem_region(u64 addr, usize size) noexcept -> VmmResult<None>;
+
+    private:
         /// @brief Set VM's memory.
         ///
         /// @param size given size of the memory region in bytes to allocate.
         ///
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
-        auto set_vm_memory(const usize size) noexcept -> VmmResult<None>;
+        auto set_vm_memory(usize size) noexcept -> VmmResult<None>;
     };
 
 }

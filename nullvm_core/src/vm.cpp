@@ -4,6 +4,8 @@
 /// Virtual machine related declarations.
 
 #include <nullvm/core/vm.hpp>
+#include <linux/kvm.h>
+#include <sys/ioctl.h>
 #include <sys/mman.h>
 
 namespace nullvm::core {
@@ -26,8 +28,7 @@ namespace nullvm::core {
         return None {};
     }
 
-    auto VirtualMachine::set_vm_memory(const usize size) noexcept
-    -> VmmResult<None> {
+    auto VirtualMachine::set_vm_memory(usize size) noexcept -> VmmResult<None> {
         if (size == 0) {
             return std::unexpected(
                 "Error to set VM's memory: mapping memory size is zero"
@@ -47,6 +48,41 @@ namespace nullvm::core {
 
         if (auto result = this->memory.init(addr, size); !result) {
             return result;
+        }
+
+        return None {};
+    }
+
+    auto VirtualMachine::set_mem_region(u64 addr, usize size) noexcept
+    -> VmmResult<None> {
+
+        if (const auto result = this->set_vm_memory(size); !result) {
+            return std::unexpected(result.error());
+        }
+
+        kvm_userspace_memory_region mem_region = {
+            // Memory slot number.
+            .slot = 0,
+            // Flags that specify attributes of the memory region.
+            .flags = 0,
+            // Starting physical address in the guest's address space where
+            // this memory region is mapped.
+            .guest_phys_addr = addr,
+            // Size of the memory region in bytes.
+            .memory_size = size,
+            // Starting address of the memory allocated in userspace that
+            // will be mapped to the guest's physical address.
+            .userspace_addr = reinterpret_cast<u64>(this->memory.addr),
+        };
+
+        const auto ret = ioctl(
+            this->vmfd.raw,
+            KVM_SET_USER_MEMORY_REGION,
+            &mem_region
+        );
+
+        if (ret == -1) {
+            return std::unexpected("Cannot set user memory region");
         }
 
         return None {};
