@@ -71,3 +71,36 @@ TEST(test_vm, test_vm_load_raw_correct) {
         EXPECT_EQ(code[i], data[i]);
     }
 }
+
+TEST(test_vm, test_vm_run1) {
+    VirtualMachine vm;
+
+    auto result = vm.init();
+    EXPECT_TRUE(result.has_value());
+
+    result = vm.set_mem_region(0x1000, 0x1000);
+    EXPECT_TRUE(result.has_value());
+
+    vm.vcpu.regs.rax = 4;
+    vm.vcpu.regs.rbx = 2;
+    result = vm.vcpu.set_regs();
+    EXPECT_TRUE(result.has_value());
+
+    const std::array<u8, 12> code = {
+        0xba, 0xf8, 0x03,   // mov $0x3f8, %dx
+        0x00, 0xd8,         // add %bl, %al
+        0x04, '0',          // add $'0', %al
+        0xee,               // out %al, (%dx)
+        0xb0, '\n',         // mov $'\n', %al
+        0xee,               // out %al, (%dx)
+        0xf4,               // hlt
+    };
+
+    const auto code_vec = std::vector<u8>(code.begin(), code.end());
+
+    result = vm.load_raw(code_vec);
+    EXPECT_TRUE(result.has_value());
+
+    result = vm.run();
+    EXPECT_TRUE(result.has_value());
+}
