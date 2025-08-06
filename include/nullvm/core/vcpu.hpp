@@ -39,13 +39,6 @@ namespace nullvm::core {
         /// @return VmmError - otherwise.
         auto init(i32 raw, usize size) noexcept -> VmmResult<None>;
 
-    private:
-        /// @brief Set initial register state of virtual CPU.
-        ///
-        /// @return None - in case of success.
-        /// @return VmmError - otherwise.
-        auto set_registers() noexcept -> VmmResult<None>;
-
         /// @brief Get special register state of virtual CPU.
         ///
         /// @return None - in case of success.
@@ -63,6 +56,13 @@ namespace nullvm::core {
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
         auto set_regs() noexcept -> VmmResult<None>;
+
+    private:
+        /// @brief Set initial register state of virtual CPU.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto set_registers() noexcept -> VmmResult<None>;
     };
 
 }
