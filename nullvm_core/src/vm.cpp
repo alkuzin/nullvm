@@ -3,7 +3,9 @@
 
 /// Virtual machine related declarations.
 
+#include <cstdio>
 #include <nullvm/core/vm.hpp>
+#include <nullvm/log.hpp>
 #include <linux/kvm.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -95,6 +97,10 @@ namespace nullvm::core {
 
         this->vcpu.regs.rip = addr;
 
+        if (auto result = this->vcpu.set_regs(); !result) {
+            return std::unexpected(result.error());
+        }
+
         const auto ret = ioctl(
             this->vmfd.raw,
             KVM_SET_USER_MEMORY_REGION,
@@ -120,4 +126,62 @@ namespace nullvm::core {
         return None {};
     }
 
+    auto VirtualMachine::run() noexcept -> VmmResult<None> {
+
+        auto state = reinterpret_cast<kvm_run*>(this->vcpu.state.addr);
+
+        while (true) {
+
+            const auto ret = ioctl(this->vcpu.raw, KVM_RUN, 0);
+
+            if (ret == -1)
+                return std::unexpected("Error to run virtual machine");
+
+            log::debug("Exit reason: {}", state->exit_reason);
+
+            switch (state->exit_reason) {
+
+                case KVM_EXIT_HLT:
+                    log::debug("KVM_EXIT_HLT");
+                    return None {};
+
+                case KVM_EXIT_IO:
+                    log::debug("KVM_EXIT_IO");
+
+                    if (auto result = this->handle_exit_io(state); !result) {
+                        return std::unexpected(result.error());
+                    }
+
+                    break;
+
+                default:
+                    log::debug("Unhandled exit reason: {}", state->exit_reason);
+                    return std::unexpected("Unhandled exit reason");
+            }
+        }
+
+    }
+
+    auto VirtualMachine::handle_exit_io(const kvm_run *state) noexcept
+    -> VmmResult<None> {
+
+        auto io = state->io;
+
+        if (io.direction == KVM_EXIT_IO_IN) {
+            log::debug("PORT IN ({:#x})", io.port);
+        }
+        else if (state->io.direction == KVM_EXIT_IO_OUT) {
+            log::debug("PORT OUT ({:#x})", io.port);
+
+            if (io.port == 0x3f8 && io.size == 1 && io.count == 1) {
+                const auto byte = *(
+                    reinterpret_cast<const u8*>(state) + io.data_offset
+                );
+
+                std::putchar(byte);
+            }
+        }
+
+        return None {};
+    }
 }

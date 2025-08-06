@@ -50,6 +50,12 @@ namespace nullvm::core {
         /// @return VmmError - otherwise.
         auto load_raw(const std::vector<u8>& raw) noexcept -> VmmResult<None>;
 
+        /// @brief Run virtual machine.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto run() noexcept -> VmmResult<None>;
+
     private:
         /// @brief Set VM's memory.
         ///
@@ -58,6 +64,14 @@ namespace nullvm::core {
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
         auto set_vm_memory(usize size) noexcept -> VmmResult<None>;
+
+        /// @brief Handle VM exit on I/O port.
+        ///
+        /// @param state given virtual CPU state.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto handle_exit_io(const kvm_run *state) noexcept -> VmmResult<None>;
     };
 
 }
