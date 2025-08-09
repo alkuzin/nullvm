@@ -4,40 +4,47 @@
 /// x86 CPU related declarations.
 
 #include <nullvm/core/cpu.hpp>
-#include <cstring>
+#include <bit>
 
 namespace nullvm::service {
 
-    /// Size of CPU vendor ID in bytes.
-    constexpr u8 CPUID_VENDOR_ID_SIZE {13};
+    namespace {
+        /// Size of CPU vendor ID in bytes.
+        constexpr u8 CPUID_VENDOR_ID_SIZE {13};
 
-    /// Size of CPU brand in bytes.
-    constexpr u8 CPUID_BRAND_SIZE {48};
+        /// Size of CPU brand in bytes.
+        constexpr u8 CPUID_BRAND_SIZE {48};
+    }
 
     auto get_cpu_vendor() -> std::string {
         std::string vendor_id;
         vendor_id.reserve(CPUID_VENDOR_ID_SIZE);
 
         auto cpu_info = cpuid(0);
-        vendor_id.append(reinterpret_cast<char*>(&cpu_info.ebx), 4);
-        vendor_id.append(reinterpret_cast<char*>(&cpu_info.ecx), 4);
-        vendor_id.append(reinterpret_cast<char*>(&cpu_info.edx), 4);
+
+        vendor_id.append(std::bit_cast<char*>(&cpu_info.ebx), 4);
+        vendor_id.append(std::bit_cast<char*>(&cpu_info.ecx), 4);
+        vendor_id.append(std::bit_cast<char*>(&cpu_info.edx), 4);
 
         return vendor_id;
     }
 
     auto get_cpu_brand() -> std::string {
-        std::string brand(CPUID_BRAND_SIZE, '\0');
         CpuidInfo cpu_info {};
 
+        auto brand_begin = std::bit_cast<char*>(&cpu_info);
+        auto brand_end   = brand_begin + sizeof(cpu_info);
+
+        std::string brand(CPUID_BRAND_SIZE, '\0');
+
         cpu_info = cpuid(0x80000002);
-        std::memcpy(&brand[0], &cpu_info, sizeof(cpu_info));
+        brand.append(brand_begin, brand_end);
 
         cpu_info = cpuid(0x80000003);
-        std::memcpy(&brand[16], &cpu_info, sizeof(cpu_info));
+        brand.append(brand_begin, brand_end);
 
         cpu_info = cpuid(0x80000004);
-        std::memcpy(&brand[32], &cpu_info, sizeof(cpu_info));
+        brand.append(brand_begin, brand_end);
 
         // Remove trailing null characters.
         auto last_non_null = brand.find_last_not_of('\0');

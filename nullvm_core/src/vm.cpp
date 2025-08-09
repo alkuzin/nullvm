@@ -3,13 +3,12 @@
 
 /// Virtual machine related declarations.
 
-#include <cstdio>
 #include <nullvm/core/vm.hpp>
 #include <nullvm/log.hpp>
 #include <linux/kvm.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <cstring>
+#include <bit>
 
 namespace nullvm::core {
 
@@ -92,7 +91,7 @@ namespace nullvm::core {
             .memory_size = size,
             // Starting address of the memory allocated in userspace that
             // will be mapped to the guest's physical address.
-            .userspace_addr = reinterpret_cast<u64>(this->memory.addr),
+            .userspace_addr = std::bit_cast<u64>(this->memory.addr),
         };
 
         this->vcpu.regs.rip = addr;
@@ -122,13 +121,16 @@ namespace nullvm::core {
         if (size == 0)
             return std::unexpected("Raw binary size is zero");
 
-        std::memcpy(this->memory.addr, raw.data(), size);
+        auto addr = static_cast<u8*>(memory.addr);
+        auto data = raw.data();
+
+        std::copy(data, data + size, addr);
         return None {};
     }
 
     auto VirtualMachine::run() noexcept -> VmmResult<None> {
 
-        auto state = reinterpret_cast<kvm_run*>(this->vcpu.state.addr);
+        auto state = std::bit_cast<kvm_run*>(this->vcpu.state.addr);
 
         while (true) {
 
@@ -175,7 +177,7 @@ namespace nullvm::core {
 
             if (io.port == 0x3f8 && io.size == 1 && io.count == 1) {
                 const auto byte = *(
-                    reinterpret_cast<const u8*>(state) + io.data_offset
+                    std::bit_cast<const u8*>(state) + io.data_offset
                 );
 
                 std::putchar(byte);

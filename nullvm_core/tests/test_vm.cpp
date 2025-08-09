@@ -3,13 +3,11 @@
 
 /// Virtual machine related declarations tests.
 
-#include "nullvm/types.hpp"
-#include "gtest/gtest.h"
 #include <nullvm/core/vm.hpp>
 #include <gtest/gtest.h>
 #include <vector>
 #include <array>
-#include <print>
+#include <bit>
 
 using namespace nullvm::core;
 using namespace nullvm;
@@ -65,7 +63,7 @@ TEST(test_vm, test_vm_load_raw_correct) {
     result = vm.load_raw(code_vec);
     EXPECT_TRUE(result.has_value());
 
-    auto data = reinterpret_cast<u8*>(vm.memory.addr);
+    auto data = std::bit_cast<u8*>(vm.memory.addr);
 
     for (usize i = 0; i < code.size(); i++) {
         EXPECT_EQ(code[i], data[i]);

@@ -9,6 +9,7 @@
 using namespace nullvm;
 
 auto main() -> i32 {
+
     log::info(
         "Running {} v{} {}",
         PROJECT_NAME, PROJECT_VERSION, PROJECT_DESCRIPTION
