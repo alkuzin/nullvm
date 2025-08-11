@@ -65,7 +65,7 @@ namespace nullvm::core {
 
         auto addr = mmap(nullptr, size, prot, flags, -1, 0);
 
-        if (auto result = this->memory.init(addr, size); !result) {
+        if (auto result = memory.init(addr, size); !result) {
             return result;
         }
 
@@ -91,7 +91,7 @@ namespace nullvm::core {
             .memory_size = size,
             // Starting address of the memory allocated in userspace that
             // will be mapped to the guest's physical address.
-            .userspace_addr = std::bit_cast<u64>(this->memory.addr),
+            .userspace_addr = std::bit_cast<u64>(memory.addr()),
         };
 
         this->vcpu.regs.rip = addr;
@@ -121,7 +121,7 @@ namespace nullvm::core {
         if (size == 0)
             return std::unexpected("Raw binary size is zero");
 
-        auto addr = static_cast<u8*>(memory.addr);
+        auto addr = static_cast<u8*>(memory.addr());
         auto data = raw.data();
 
         std::copy(data, data + size, addr);
@@ -130,7 +130,7 @@ namespace nullvm::core {
 
     auto VirtualMachine::run() noexcept -> VmmResult<None> {
 
-        auto state = std::bit_cast<kvm_run*>(this->vcpu.state.addr);
+        auto state = std::bit_cast<kvm_run*>(vcpu.state.addr());
 
         while (true) {
 

@@ -9,6 +9,13 @@
 
 namespace nullvm::core {
 
+    auto MMapDeleter::operator()(void *addr) const noexcept -> void {
+        if (m_size != 0) {
+            if (const auto ret = munmap(addr, m_size); ret == -1)
+                log::panic("Error unmapping memory: {}", std::strerror(errno));
+        }
+    }
+
     auto MMapWrapper::init(void *addr, usize size) noexcept -> VmmResult<None> {
 
         if (!addr)
@@ -20,24 +27,18 @@ namespace nullvm::core {
         if (size == 0)
             return std::unexpected("Mapped data size cannot be 0");
 
-        this->addr = addr;
-        this->size = size;
+        m_addr = std::unique_ptr<void, MMapDeleter>(addr, size);
+        m_size = size;
 
         return None {};
     }
 
-    MMapWrapper::~MMapWrapper() noexcept {
+    auto MMapWrapper::addr() const noexcept -> void * {
+        return m_addr.get();
+    }
 
-        if (const auto ret = munmap(this->addr, this->size); ret == -1) {
-            log::error("Error unmapping memory: {}", std::strerror(errno));
-            log::error(
-                "munmap: addr: <{:p}> size: {} bytes",
-                this->addr, this->size
-            );
-        }
-
-        this->addr = nullptr;
-        this->size = 0;
+    auto MMapWrapper::size() const noexcept -> usize {
+        return m_size;
     }
 
 }

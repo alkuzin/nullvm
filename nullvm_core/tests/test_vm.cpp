@@ -63,7 +63,7 @@ TEST(test_vm, test_vm_load_raw_correct) {
     result = vm.load_raw(code_vec);
     EXPECT_TRUE(result.has_value());
 
-    auto data = std::bit_cast<u8*>(vm.memory.addr);
+    auto data = std::bit_cast<u8*>(vm.memory.addr());
 
     for (usize i = 0; i < code.size(); i++) {
         EXPECT_EQ(code[i], data[i]);

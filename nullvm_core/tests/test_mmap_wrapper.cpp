@@ -50,18 +50,3 @@ TEST(test_mmap_wrapper, test_mmap_wrapper_creation_incorrect_size) {
     EXPECT_FALSE(result.has_value());
     GTEST_LOG_(INFO) << "Result: " << result.error();
 }
-
-TEST(test_mmap_wrapper, test_mmap_wrapper_destructing_correct) {
-    MMapWrapper wrapper;
-
-    const auto prot  = PROT_READ | PROT_WRITE;
-    const auto flags = MAP_SHARED | MAP_ANONYMOUS;
-    const auto size  = 0x1000;
-
-    auto addr = mmap(nullptr, size, prot, flags, -1, 0);
-    const auto result = wrapper.init(addr, size);
-    wrapper.~MMapWrapper();
-
-    EXPECT_EQ(wrapper.addr, nullptr);
-    EXPECT_EQ(wrapper.size, 0);
-}
