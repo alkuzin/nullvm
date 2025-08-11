@@ -14,6 +14,7 @@ set(SOURCE_FILES
         src/vm.cpp
         src/mmap_wrapper.cpp
         src/vcpu.cpp
+        src/fd_wrapper.cpp
 )
 
 # Create a shared library.
@@ -34,6 +35,7 @@ set(TESTS_SOURCE_FILES
         tests/test_kvm.cpp
         tests/test_vm.cpp
         tests/test_mmap_wrapper.cpp
+        tests/test_fd_wrapper.cpp
 )
 
 add_executable(${TESTS_EXECUTABLE} ${TESTS_SOURCE_FILES})
