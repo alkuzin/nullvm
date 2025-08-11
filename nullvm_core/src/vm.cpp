@@ -101,7 +101,7 @@ namespace nullvm::core {
         }
 
         const auto ret = ioctl(
-            this->vmfd.raw,
+            vmfd.fd(),
             KVM_SET_USER_MEMORY_REGION,
             &mem_region
         );

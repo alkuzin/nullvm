@@ -6,28 +6,29 @@
 #ifndef NULLVM_CORE_VMFD_HPP
 #define NULLVM_CORE_VMFD_HPP
 
+#include <nullvm/core/fd_wrapper.hpp>
 #include <nullvm/types.hpp>
 
 namespace nullvm::core {
 
     /// Virtual machine file descriptor management struct.
-    struct VmFd {
-        /// Raw virtual machine file descriptor.
-        i32 raw;
+    class VmFd final {
+        /// Virtual machine file descriptor.
+        FDWrapper m_fd;
 
-        /// @brief Construct new VmFd object.
-        VmFd() noexcept: raw(-1) {}
-
-        /// @brief Destruct VmFd object.
-        ~VmFd() noexcept;
-
+    public:
         /// @brief Initialize VmFd object.
         ///
-        /// @param [in] raw given raw virtual machine file descriptor.
+        /// @param [in] fd given raw virtual machine file descriptor.
         ///
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
-        auto init(i32 raw) noexcept -> VmmResult<None>;
+        auto init(i32 fd) noexcept -> VmmResult<None>;
+
+        /// @brief Get raw file descriptor value.
+        ///
+        /// @return Raw file descriptor value.
+        auto fd() const noexcept -> i32;
 
         /// @brief Create virtual CPU.
         ///

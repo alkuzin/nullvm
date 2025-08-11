@@ -9,14 +9,17 @@
 
 using namespace nullvm::core;
 
-/// @brief Check whether file descriptor is open.
-///
-/// @param [in] fd given file descriptor to check.
-///
-/// @return true - if file descriptor is open.
-/// @return false - otherwise.
-static auto is_fd_open(const nullvm::i32 fd) -> bool {
-    return fcntl(fd, F_GETFD) != -1;
+// TODO: move to utils from this and other tests.
+namespace {
+    /// @brief Check whether file descriptor is open.
+    ///
+    /// @param [in] fd given file descriptor to check.
+    ///
+    /// @return true - if file descriptor is open.
+    /// @return false - otherwise.
+    auto is_fd_open(const nullvm::i32 fd) -> bool {
+        return fcntl(fd, F_GETFD) != -1;
+    }
 }
 
 TEST(test_vmfd, test_vmfd_creation_correct) {
@@ -36,11 +39,10 @@ TEST(test_vmfd, test_vmfd_closing_file_descriptor) {
 
     EXPECT_TRUE(result.has_value());
 
-    const auto fd = vmfd.raw;
+    const auto fd = vmfd.fd();
     vmfd.~VmFd();
 
     EXPECT_FALSE(is_fd_open(fd));
-    EXPECT_EQ(vmfd.raw, -1);
 }
 
 TEST(test_vmfd, test_vmfd_creation_negative_fd) {

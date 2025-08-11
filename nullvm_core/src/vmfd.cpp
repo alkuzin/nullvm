@@ -6,35 +6,35 @@
 #include <nullvm/core/vmfd.hpp>
 #include <linux/kvm.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 
 namespace nullvm::core {
 
-    auto VmFd::init(const i32 raw) noexcept -> VmmResult<None> {
-        if (raw < 0) {
-            const auto err = "Invalid file descriptor: must be non-negative";
-            return std::unexpected(err);
+    auto VmFd::init(i32 fd) noexcept -> VmmResult<None> {
+
+        if (fd < 0) {
+            return std::unexpected(
+            "Invalid file descriptor: must be non-negative"
+            );
         }
 
-        if (raw == 0 || raw == 1 || raw == 2) {
-            const auto err = "Invalid file descriptor: cannot be 0, 1, or 2 "
-            "(stdin, stdout, stderr)";
-            return std::unexpected(err);
+        if (fd == 0 || fd == 1 || fd == 2) {
+            return std::unexpected(
+                "Invalid file descriptor: cannot be 0, 1, or 2 "
+                "(stdin, stdout, stderr)"
+            );
         }
 
-        this->raw = raw;
+        m_fd = FDWrapper(fd);
         return None {};
     }
 
-    VmFd::~VmFd() noexcept {
-        if (this->raw != -1) {
-            close(this->raw);
-            this->raw = -1;
-        }
+    auto VmFd::fd() const noexcept -> i32 {
+        return m_fd.fd();
     }
 
     auto VmFd::create_vcpu() const -> VmmResult<i32> {
-        const auto result = ioctl(this->raw, KVM_CREATE_VCPU, 0);
+
+        const auto result = ioctl(m_fd.fd(), KVM_CREATE_VCPU, 0);
 
         if (result == -1)
             return std::unexpected("Error to create virtual CPU");
