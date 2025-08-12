@@ -6,6 +6,7 @@
 #ifndef NULLVM_CORE_KVM_HPP
 #define NULLVM_CORE_KVM_HPP
 
+#include "nullvm/types.hpp"
 #include <nullvm/core/vmfd.hpp>
 
 namespace nullvm::core {
@@ -26,6 +27,12 @@ namespace nullvm::core {
         ///
         /// @return Raw file descriptor value.
         auto fd() const noexcept -> i32;
+
+        /// @brief Get virtual CPU memory map size.
+        ///
+        /// @return Virtual CPU memory map size in bytes - in case of success.
+        /// @return VmmError - otherwise.
+        auto vcpu_mmap_size() -> VmmResult<usize>;
 
         /// @brief Create virtual machine.
         ///

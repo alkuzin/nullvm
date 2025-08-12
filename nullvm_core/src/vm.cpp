@@ -31,10 +31,12 @@ namespace nullvm::core {
 
         const auto vcpufd = vcpu_result.value();
 
-        // TODO: implement Kvm method for that.
-        const auto size = static_cast<usize>(
-            ioctl(m_kvm.fd(), KVM_GET_VCPU_MMAP_SIZE, 0)
-        );
+        auto result = m_kvm.vcpu_mmap_size();
+
+        if (!result)
+            return std::unexpected(result.error());
+
+        auto size = result.value();
 
         if (auto result = m_vcpu.init(vcpufd, size); !result)
             return std::unexpected(result.error());

@@ -3,6 +3,8 @@
 
 /// Kernel-based Virtual Machine (KVM) subsystem handle.
 
+#include "nullvm/types.hpp"
+#include <expected>
 #include <nullvm/core/kvm.hpp>
 #include <nullvm/log.hpp>
 #include <linux/kvm.h>
@@ -47,6 +49,15 @@ namespace nullvm::core {
 
     auto Kvm::fd() const noexcept -> i32 {
         return m_fd.fd();
+    }
+
+    auto Kvm::vcpu_mmap_size() -> VmmResult<usize> {
+        const auto ret = ioctl(m_fd.fd(), KVM_GET_VCPU_MMAP_SIZE, 0);
+
+        if (ret == -1)
+            return std::unexpected("Error to get vCPU mmap size");
+
+        return static_cast<usize>(ret);
     }
 
     auto Kvm::create_vm() const -> VmmResult<i32> {
