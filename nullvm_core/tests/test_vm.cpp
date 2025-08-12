@@ -79,9 +79,14 @@ TEST(test_vm, test_vm_run1) {
     result = vm.set_mem_region(0x1000, 0x1000);
     EXPECT_TRUE(result.has_value());
 
-    vm.vcpu.regs.rax = 4;
-    vm.vcpu.regs.rbx = 2;
-    result = vm.vcpu.set_regs();
+    auto regs_result = vm.vcpu.regs();
+    EXPECT_TRUE(regs_result.has_value());
+
+    auto regs = regs_result.value();
+    regs.rax = 4;
+    regs.rbx = 2;
+
+    result = vm.vcpu.set_regs(regs);
     EXPECT_TRUE(result.has_value());
 
     const std::array<u8, 12> code = {

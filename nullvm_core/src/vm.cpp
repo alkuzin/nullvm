@@ -74,10 +74,8 @@ namespace nullvm::core {
 
     auto VirtualMachine::set_mem_region(u64 addr, usize size) noexcept
     -> VmmResult<None> {
-
-        if (const auto result = this->set_vm_memory(size); !result) {
+        if (auto result = set_vm_memory(size); !result)
             return std::unexpected(result.error());
-        }
 
         kvm_userspace_memory_region mem_region = {
             // Memory slot number.
@@ -94,12 +92,19 @@ namespace nullvm::core {
             .userspace_addr = std::bit_cast<u64>(memory.addr()),
         };
 
-        this->vcpu.regs.rip = addr;
+        // Set virtual CPU registers.
+        auto result = vcpu.regs();
 
-        if (auto result = this->vcpu.set_regs(); !result) {
+        if (!result)
             return std::unexpected(result.error());
-        }
 
+        auto regs = result.value();
+        regs.rip = addr;
+
+        if (auto result = vcpu.set_regs(regs); !result)
+            return std::unexpected(result.error());
+
+        // TODO: move to VmFd.
         const auto ret = ioctl(
             vmfd.fd(),
             KVM_SET_USER_MEMORY_REGION,
@@ -129,18 +134,13 @@ namespace nullvm::core {
     }
 
     auto VirtualMachine::run() noexcept -> VmmResult<None> {
-
-        auto state = std::bit_cast<kvm_run*>(vcpu.state.addr());
+        auto state = vcpu.state();
 
         while (true) {
-
-            const auto ret = ioctl(this->vcpu.raw, KVM_RUN, 0);
-
-            if (ret == -1)
-                return std::unexpected("Error to run virtual machine");
+            if (auto result = vcpu.run(); !result)
+                return std::unexpected(result.error());
 
             log::debug("Exit reason: {}", state->exit_reason);
-
             switch (state->exit_reason) {
 
                 case KVM_EXIT_HLT:
@@ -150,9 +150,8 @@ namespace nullvm::core {
                 case KVM_EXIT_IO:
                     log::debug("KVM_EXIT_IO");
 
-                    if (auto result = this->handle_exit_io(state); !result) {
+                    if (auto result = handle_exit_io(state); !result)
                         return std::unexpected(result.error());
-                    }
 
                     break;
 
