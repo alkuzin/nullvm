@@ -36,7 +36,7 @@ namespace nullvm::core {
 
         const auto vcpufd = vcpu_result.value();
         const auto size = static_cast<usize>(
-            ioctl(this->kvm.raw, KVM_GET_VCPU_MMAP_SIZE, 0)
+            ioctl(kvm.fd(), KVM_GET_VCPU_MMAP_SIZE, 0)
         );
 
         if (auto result = this->vcpu.init(vcpufd, size); !result) {

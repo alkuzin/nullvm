@@ -11,22 +11,24 @@
 
 namespace nullvm::core {
 
-    // Special file that provides an interface to the KVM subsystem.
-    constexpr auto KVM_FILE = "/dev/kvm";
+    namespace {
+        // Special file that provides an interface to the KVM subsystem.
+        constexpr auto KVM_FILE = "/dev/kvm";
+    }
 
     auto Kvm::init() noexcept -> VmmResult<None> {
         // O_RDWR - read & write permission flag.
         // O_CLOEXEC - ensures that the file descriptor is automatically closed
         // during the execution of an exec() family function.
-        this->raw = open("/dev/kvm", O_RDWR | O_CLOEXEC);
+        const auto fd = open("/dev/kvm", O_RDWR | O_CLOEXEC);
 
-        if (this->raw == -1) {
+        if (fd == -1) {
             const auto err = std::format("Error to open '{}'", KVM_FILE);
             return std::unexpected(err);
         }
 
         // Check KVM version.
-        const auto ret = ioctl(this->raw, KVM_GET_API_VERSION, 0);
+        const auto ret = ioctl(fd, KVM_GET_API_VERSION, 0);
 
         if (ret == -1)
             return std::unexpected("Error to get KVM API version");
@@ -39,18 +41,17 @@ namespace nullvm::core {
             return std::unexpected(err);
         }
 
+        m_fd = FDWrapper(fd);
         return None {};
     }
 
-    Kvm::~Kvm() noexcept {
-        if (this->raw != -1) {
-            close(this->raw);
-            this->raw = -1;
-        }
+    auto Kvm::fd() const noexcept -> i32 {
+        return m_fd.fd();
     }
 
     auto Kvm::create_vm() const -> VmmResult<i32> {
-        const auto vmfd = ioctl(this->raw, KVM_CREATE_VM, 0);
+
+        const auto vmfd = ioctl(m_fd.fd(), KVM_CREATE_VM, 0);
 
         if (vmfd == -1) {
             const auto err = std::format(

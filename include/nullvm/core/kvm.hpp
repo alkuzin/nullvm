@@ -11,21 +11,21 @@
 namespace nullvm::core {
 
     /// KVM subsystem handler struct.
-    struct Kvm {
-        /// Raw KVM file descriptor.
-        i32 raw;
+    class Kvm final {
+        /// KVM file descriptor.
+        FDWrapper m_fd;
 
-        /// @brief Construct new Kvm object.
-        Kvm() noexcept: raw(-1) {}
-
-        /// @brief Destruct Kvm object.
-        ~Kvm() noexcept;
-
+    public:
         /// @brief Initialize Kvm object.
         ///
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
         auto init() noexcept -> VmmResult<None>;
+
+        /// @brief Get raw file descriptor value.
+        ///
+        /// @return Raw file descriptor value.
+        auto fd() const noexcept -> i32;
 
         /// @brief Create virtual machine.
         ///
