@@ -14,24 +14,27 @@
 namespace nullvm::core {
 
     /// Virtual machine info struct.
-    struct VirtualMachine {
+    class VirtualMachine final {
         /// KVM subsystem handle.
-        Kvm kvm;
+        Kvm m_kvm;
         /// Virtual machine file descriptor.
-        VmFd vmfd;
+        VmFd m_vmfd;
         /// Memory allocated to VM.
-        MMapWrapper memory;
+        MMapWrapper m_memory;
         /// Virtual CPU handle.
-        VCpu vcpu;
+        VCpu m_vcpu;
 
-        /// @brief Construct new VirtualMachine object.
-        VirtualMachine() noexcept = default;
-
+    public:
         /// @brief Initialize VirtualMachine object.
         ///
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
         auto init() noexcept -> VmmResult<None>;
+
+        /// @brief Get virtual CPU.
+        ///
+        /// @return VM's virtual CPU.
+        auto vcpu() & noexcept -> VCpu&;
 
         /// @brief Set userspace memory region.
         ///

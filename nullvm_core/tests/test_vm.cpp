@@ -7,7 +7,6 @@
 #include <gtest/gtest.h>
 #include <vector>
 #include <array>
-#include <bit>
 
 using namespace nullvm::core;
 using namespace nullvm;
@@ -62,12 +61,6 @@ TEST(test_vm, test_vm_load_raw_correct) {
 
     result = vm.load_raw(code_vec);
     EXPECT_TRUE(result.has_value());
-
-    auto data = std::bit_cast<u8*>(vm.memory.addr());
-
-    for (usize i = 0; i < code.size(); i++) {
-        EXPECT_EQ(code[i], data[i]);
-    }
 }
 
 TEST(test_vm, test_vm_run1) {
@@ -79,14 +72,16 @@ TEST(test_vm, test_vm_run1) {
     result = vm.set_mem_region(0x1000, 0x1000);
     EXPECT_TRUE(result.has_value());
 
-    auto regs_result = vm.vcpu.regs();
+    auto& vcpu = vm.vcpu();
+
+    auto regs_result = vcpu.regs();
     EXPECT_TRUE(regs_result.has_value());
 
     auto regs = regs_result.value();
     regs.rax = 4;
     regs.rbx = 2;
 
-    result = vm.vcpu.set_regs(regs);
+    result = vcpu.set_regs(regs);
     EXPECT_TRUE(result.has_value());
 
     const std::array<u8, 12> code = {

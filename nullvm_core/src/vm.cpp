@@ -13,41 +13,40 @@
 namespace nullvm::core {
 
     auto VirtualMachine::init() noexcept -> VmmResult<None> {
-
-        if (auto result = this->kvm.init(); !result) {
+        if (auto result = m_kvm.init(); !result)
             return result;
-        }
 
-        auto vmfd_result = this->kvm.create_vm();
+        auto vmfd_result = m_kvm.create_vm();
 
-        if (!vmfd_result) {
+        if (!vmfd_result)
             return std::unexpected(vmfd_result.error());
-        }
 
-        if (auto result = this->vmfd.init(vmfd_result.value()); !result) {
+        if (auto result = m_vmfd.init(vmfd_result.value()); !result)
             return std::unexpected(result.error());
-        }
 
-        auto vcpu_result = this->vmfd.create_vcpu();
+        auto vcpu_result = m_vmfd.create_vcpu();
 
-        if (!vcpu_result) {
+        if (!vcpu_result)
             return std::unexpected(vcpu_result.error());
-        }
 
         const auto vcpufd = vcpu_result.value();
+
+        // TODO: implement Kvm method for that.
         const auto size = static_cast<usize>(
-            ioctl(kvm.fd(), KVM_GET_VCPU_MMAP_SIZE, 0)
+            ioctl(m_kvm.fd(), KVM_GET_VCPU_MMAP_SIZE, 0)
         );
 
-        if (auto result = this->vcpu.init(vcpufd, size); !result) {
+        if (auto result = m_vcpu.init(vcpufd, size); !result)
             return std::unexpected(result.error());
-        }
 
         return None {};
     }
 
-    auto VirtualMachine::set_vm_memory(usize size) noexcept -> VmmResult<None> {
+    auto VirtualMachine::vcpu() & noexcept -> VCpu& {
+        return m_vcpu;
+    }
 
+    auto VirtualMachine::set_vm_memory(usize size) noexcept -> VmmResult<None> {
         if (size == 0) {
             return std::unexpected(
                 "Error to set VM's memory: mapping memory size is zero"
@@ -65,9 +64,8 @@ namespace nullvm::core {
 
         auto addr = mmap(nullptr, size, prot, flags, -1, 0);
 
-        if (auto result = memory.init(addr, size); !result) {
+        if (auto result = m_memory.init(addr, size); !result)
             return result;
-        }
 
         return None {};
     }
@@ -89,11 +87,11 @@ namespace nullvm::core {
             .memory_size = size,
             // Starting address of the memory allocated in userspace that
             // will be mapped to the guest's physical address.
-            .userspace_addr = std::bit_cast<u64>(memory.addr()),
+            .userspace_addr = std::bit_cast<u64>(m_memory.addr()),
         };
 
         // Set virtual CPU registers.
-        auto result = vcpu.regs();
+        auto result = m_vcpu.regs();
 
         if (!result)
             return std::unexpected(result.error());
@@ -101,43 +99,41 @@ namespace nullvm::core {
         auto regs = result.value();
         regs.rip = addr;
 
-        if (auto result = vcpu.set_regs(regs); !result)
+        if (auto result = m_vcpu.set_regs(regs); !result)
             return std::unexpected(result.error());
 
         // TODO: move to VmFd.
         const auto ret = ioctl(
-            vmfd.fd(),
+            m_vmfd.fd(),
             KVM_SET_USER_MEMORY_REGION,
             &mem_region
         );
 
-        if (ret == -1) {
+        if (ret == -1)
             return std::unexpected("Cannot set user memory region");
-        }
 
         return None {};
     }
 
     auto VirtualMachine::load_raw(const std::vector<u8>& raw) noexcept
     -> VmmResult<None> {
-
         const auto size = raw.size();
 
         if (size == 0)
             return std::unexpected("Raw binary size is zero");
 
-        auto addr = static_cast<u8*>(memory.addr());
+        auto addr = static_cast<u8*>(m_memory.addr());
         auto data = raw.data();
-
         std::copy(data, data + size, addr);
+
         return None {};
     }
 
     auto VirtualMachine::run() noexcept -> VmmResult<None> {
-        auto state = vcpu.state();
+        auto state = m_vcpu.state();
 
         while (true) {
-            if (auto result = vcpu.run(); !result)
+            if (auto result = m_vcpu.run(); !result)
                 return std::unexpected(result.error());
 
             log::debug("Exit reason: {}", state->exit_reason);
@@ -165,7 +161,6 @@ namespace nullvm::core {
 
     auto VirtualMachine::handle_exit_io(const kvm_run *state) noexcept
     -> VmmResult<None> {
-
         auto io = state->io;
 
         if (io.direction == KVM_EXIT_IO_IN) {
