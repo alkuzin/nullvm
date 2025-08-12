@@ -6,12 +6,12 @@
 #ifndef NULLVM_CORE_VMFD_HPP
 #define NULLVM_CORE_VMFD_HPP
 
-#include <nullvm/core/fd_wrapper.hpp>
+#include <nullvm/core/utils/fd_wrapper.hpp>
 #include <nullvm/types.hpp>
 #include <linux/kvm.h>
 
 namespace nullvm::core {
-
+    using utils::FDWrapper;
     using MemoryRegion = kvm_userspace_memory_region;
 
     /// Virtual machine file descriptor management struct.

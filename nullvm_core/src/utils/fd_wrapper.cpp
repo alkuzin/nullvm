@@ -3,9 +3,9 @@
 
 /// Value wrapper for raw file descriptor related declarations.
 
-#include <nullvm/core/fd_wrapper.hpp>
+#include <nullvm/core/utils/fd_wrapper.hpp>
 
-namespace nullvm::core {
+namespace nullvm::core::utils {
 
     auto FDDeleter::operator()(i32 *fd) const noexcept -> void {
         if (fd && *fd != -1) {

@@ -3,13 +3,13 @@
 
 /// Value wrapper for raw file descriptor related declarations.
 
-#ifndef NULLVM_CORE_FD_WRAPPER_HPP
-#define NULLVM_CORE_FD_WRAPPER_HPP
+#ifndef NULLVM_CORE_UTILS_FD_WRAPPER_HPP
+#define NULLVM_CORE_UTILS_FD_WRAPPER_HPP
 
 #include <nullvm/types.hpp>
 #include <memory>
 
-namespace nullvm::core {
+namespace nullvm::core::utils {
 
     /// Raw file descriptor deleter struct.
     struct FDDeleter final {
@@ -41,4 +41,4 @@ namespace nullvm::core {
 
 }
 
-#endif // NULLVM_CORE_FD_WRAPPER_HPP
+#endif // NULLVM_CORE_UTILS_FD_WRAPPER_HPP

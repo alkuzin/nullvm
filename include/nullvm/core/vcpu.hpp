@@ -6,12 +6,14 @@
 #ifndef NULLVM_CORE_VCPU_HPP
 #define NULLVM_CORE_VCPU_HPP
 
-#include <nullvm/core/mmap_wrapper.hpp>
-#include <nullvm/core/fd_wrapper.hpp>
+#include <nullvm/core/utils/mmap_wrapper.hpp>
+#include <nullvm/core/utils/fd_wrapper.hpp>
 #include <nullvm/types.hpp>
 #include <linux/kvm.h>
 
 namespace nullvm::core {
+    using utils::FDWrapper;
+    using utils::MMapWrapper;
 
     /// Virtual CPU file descriptor management struct.
     class VCpu final {

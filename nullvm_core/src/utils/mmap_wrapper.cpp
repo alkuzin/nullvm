@@ -3,11 +3,11 @@
 
 /// Value wrapper for mmap syscall related declarations.
 
-#include <nullvm/core/mmap_wrapper.hpp>
+#include <nullvm/core/utils/mmap_wrapper.hpp>
 #include <nullvm/log.hpp>
 #include <sys/mman.h>
 
-namespace nullvm::core {
+namespace nullvm::core::utils {
 
     auto MMapDeleter::operator()(void *addr) const noexcept -> void {
         if (m_size != 0) {

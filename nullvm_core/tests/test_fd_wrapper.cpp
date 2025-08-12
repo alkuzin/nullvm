@@ -3,11 +3,12 @@
 
 /// Value wrapper for raw file descriptor tests.
 
-#include <nullvm/core/fd_wrapper.hpp>
+#include <nullvm/core/utils/fd_wrapper.hpp>
 #include <gtest/gtest.h>
 #include <fcntl.h>
 
 using namespace nullvm::core;
+using utils::FDWrapper;
 
 // TODO: move to utils from this and other tests.
 namespace {

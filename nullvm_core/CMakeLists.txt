@@ -12,9 +12,9 @@ set(SOURCE_FILES
         src/vmfd.cpp
         src/kvm.cpp
         src/vm.cpp
-        src/mmap_wrapper.cpp
         src/vcpu.cpp
-        src/fd_wrapper.cpp
+        src/utils/mmap_wrapper.cpp
+        src/utils/fd_wrapper.cpp
 )
 
 # Create a shared library.

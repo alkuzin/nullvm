@@ -6,7 +6,7 @@
 #ifndef NULLVM_CORE_VM_HPP
 #define NULLVM_CORE_VM_HPP
 
-#include <nullvm/core/mmap_wrapper.hpp>
+#include <nullvm/core/utils/mmap_wrapper.hpp>
 #include <nullvm/core/vcpu.hpp>
 #include <nullvm/core/kvm.hpp>
 #include <vector>

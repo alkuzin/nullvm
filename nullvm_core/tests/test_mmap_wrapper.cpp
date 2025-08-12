@@ -3,11 +3,12 @@
 
 /// Value wrapper for mmap syscall tests.
 
-#include <nullvm/core/mmap_wrapper.hpp>
+#include <nullvm/core/utils/mmap_wrapper.hpp>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
 
 using namespace nullvm::core;
+using utils::MMapWrapper;
 
 TEST(test_mmap_wrapper, test_mmap_wrapper_creation_correct) {
     MMapWrapper wrapper;

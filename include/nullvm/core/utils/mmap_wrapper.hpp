@@ -3,13 +3,13 @@
 
 /// Value wrapper for mmap syscall related declarations.
 
-#ifndef NULLVM_CORE_MMAP_WRAPPER_HPP
-#define NULLVM_CORE_MMAP_WRAPPER_HPP
+#ifndef NULLVM_CORE_UTILS_MMAP_WRAPPER_HPP
+#define NULLVM_CORE_UTILS_MMAP_WRAPPER_HPP
 
 #include <nullvm/types.hpp>
 #include <memory>
 
-namespace nullvm::core {
+namespace nullvm::core::utils {
 
     /// Mapped data deleter struct.
     struct MMapDeleter final {
@@ -60,4 +60,4 @@ namespace nullvm::core {
 
 }
 
-#endif // NULLVM_CORE_MMAP_WRAPPER_HPP
+#endif // NULLVM_CORE_UTILS_MMAP_WRAPPER_HPP
