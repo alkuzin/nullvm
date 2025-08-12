@@ -15,6 +15,7 @@ set(SOURCE_FILES
         src/vcpu.cpp
         src/utils/mmap_wrapper.cpp
         src/utils/fd_wrapper.cpp
+        src/utils/utils.cpp
 )
 
 # Create a shared library.

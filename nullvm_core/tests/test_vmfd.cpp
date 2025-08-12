@@ -3,24 +3,12 @@
 
 /// KVM virtual machine file descriptor handle tests.
 
+#include <nullvm/core/utils/utils.hpp>
 #include <nullvm/core/vmfd.hpp>
 #include <gtest/gtest.h>
 #include <fcntl.h>
 
 using namespace nullvm::core;
-
-// TODO: move to utils from this and other tests.
-namespace {
-    /// @brief Check whether file descriptor is open.
-    ///
-    /// @param [in] fd given file descriptor to check.
-    ///
-    /// @return true - if file descriptor is open.
-    /// @return false - otherwise.
-    auto is_fd_open(const nullvm::i32 fd) -> bool {
-        return fcntl(fd, F_GETFD) != -1;
-    }
-}
 
 TEST(test_vmfd, test_vmfd_creation_correct) {
     VmFd vmfd;
@@ -42,7 +30,7 @@ TEST(test_vmfd, test_vmfd_closing_file_descriptor) {
     const auto fd = vmfd.fd();
     vmfd.~VmFd();
 
-    EXPECT_FALSE(is_fd_open(fd));
+    EXPECT_FALSE(utils::is_fd_open(fd));
 }
 
 TEST(test_vmfd, test_vmfd_creation_negative_fd) {
