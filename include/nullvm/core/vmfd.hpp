@@ -8,8 +8,11 @@
 
 #include <nullvm/core/fd_wrapper.hpp>
 #include <nullvm/types.hpp>
+#include <linux/kvm.h>
 
 namespace nullvm::core {
+
+    using MemoryRegion = kvm_userspace_memory_region;
 
     /// Virtual machine file descriptor management struct.
     class VmFd final {
@@ -29,6 +32,15 @@ namespace nullvm::core {
         ///
         /// @return Raw file descriptor value.
         auto fd() const noexcept -> i32;
+
+        /// @brief Set userspace memory region.
+        ///
+        /// @param [in] region given userspace memory region to set.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto set_user_mem_region(const MemoryRegion& region) const noexcept
+        -> VmmResult<None>;
 
         /// @brief Create virtual CPU.
         ///

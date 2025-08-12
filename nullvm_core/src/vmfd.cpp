@@ -4,13 +4,11 @@
 /// KVM virtual machine file descriptor handle.
 
 #include <nullvm/core/vmfd.hpp>
-#include <linux/kvm.h>
 #include <sys/ioctl.h>
 
 namespace nullvm::core {
 
     auto VmFd::init(i32 fd) noexcept -> VmmResult<None> {
-
         if (fd < 0) {
             return std::unexpected(
             "Invalid file descriptor: must be non-negative"
@@ -32,8 +30,17 @@ namespace nullvm::core {
         return m_fd.fd();
     }
 
-    auto VmFd::create_vcpu() const -> VmmResult<i32> {
+    auto VmFd::set_user_mem_region(const MemoryRegion& region) const noexcept
+    -> VmmResult<None> {
+        auto ret = ioctl(m_fd.fd(), KVM_SET_USER_MEMORY_REGION, &region);
 
+        if (ret == -1)
+            return std::unexpected("Cannot set userspace memory region");
+
+        return None {};
+    }
+
+    auto VmFd::create_vcpu() const -> VmmResult<i32> {
         const auto result = ioctl(m_fd.fd(), KVM_CREATE_VCPU, 0);
 
         if (result == -1)

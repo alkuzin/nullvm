@@ -104,15 +104,8 @@ namespace nullvm::core {
         if (auto result = m_vcpu.set_regs(regs); !result)
             return std::unexpected(result.error());
 
-        // TODO: move to VmFd.
-        const auto ret = ioctl(
-            m_vmfd.fd(),
-            KVM_SET_USER_MEMORY_REGION,
-            &mem_region
-        );
-
-        if (ret == -1)
-            return std::unexpected("Cannot set user memory region");
+        if (auto result = m_vmfd.set_user_mem_region(mem_region); !result)
+            return std::unexpected(result.error());
 
         return None {};
     }
