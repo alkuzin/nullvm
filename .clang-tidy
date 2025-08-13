@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2025-present nullvm project and contributors
+
+# Configuration file of Clang-Tidy - static analysis tool.
+
+# Enable specific checks.
+Checks: '-*, modernize-*, performance-*, bugprone-*'
