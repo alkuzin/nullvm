@@ -9,22 +9,16 @@
 using namespace nullvm;
 
 auto main() -> i32 {
-
-    log::info(
-        "Running {} v{} {}",
-        PROJECT_NAME, PROJECT_VERSION, PROJECT_DESCRIPTION
-    );
     log::info("Running NullVM hypervisor management service");
     log::info("Detected CPU:");
-    log::info("CPU vendor: {}", service::get_cpu_vendor());
-    log::info("CPU brand: {}", service::get_cpu_brand());
+    log::info("CPU vendor: {}", core::get_cpu_vendor());
+    log::info("CPU brand: {}", core::get_cpu_brand());
 
-    if (!service::is_virtualization_supported()) {
+    if (!core::is_virtualization_supported()) {
         log::error("This CPU doesn't support virtualization");
         std::exit(EXIT_FAILURE);
     }
 
     log::info("This CPU support virtualization");
-
     return 0;
 }

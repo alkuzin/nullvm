@@ -8,7 +8,7 @@
 
 #include <nullvm/types.hpp>
 
-namespace nullvm::service {
+namespace nullvm::core {
 
     /// CPUID information registers struct.
     struct CpuidInfo {

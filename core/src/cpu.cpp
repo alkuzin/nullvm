@@ -6,7 +6,7 @@
 #include <nullvm/core/cpu.hpp>
 #include <bit>
 
-namespace nullvm::service {
+namespace nullvm::core {
 
     namespace {
         /// Size of CPU vendor ID in bytes.
