@@ -18,9 +18,6 @@ namespace nullvm::service {
     /// TODO: change socket directory from '/tmp'.
     constexpr auto STREAM_SERVER_PATH {"/tmp/nullvm_stream_server"};
 
-    /// Stream UDS server connection requests limit.
-    constexpr auto STREAM_SERVER_BACKLOG {5};
-
     /// Stream UDS server class.
     class StreamUDS final : public Server {
         /// Socket file descriptor.
@@ -33,13 +30,31 @@ namespace nullvm::service {
         ///
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
-        auto init() noexcept -> VmmResult<None>;
+        auto init() noexcept -> VmmResult<None> override;
+
+        /// @brief Send data to client.
+        ///
+        /// @param [in] fd given client connection file descriptor.
+        /// @param [in] data given sequence of bytes to send.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto send(i32 fd, const Bytes& data) noexcept
+        -> VmmResult<None> override;
+
+        /// @brief Receive data from client.
+        ///
+        /// @param [in] fd given client connection file descriptor.
+        ///
+        /// @return Received sequence of bytes - in case of success.
+        /// @return VmmError - otherwise.
+        auto recv(i32 fd) noexcept -> VmmResult<Bytes> override;
 
         /// @brief Run server.
         ///
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
-        auto run() noexcept -> VmmResult<None>;
+        auto run() noexcept -> VmmResult<None> override;
 
     private:
         /// @brief Bind server address.

@@ -12,6 +12,14 @@
 
 namespace nullvm::service {
 
+    namespace {
+        /// Received data buffer size limit in bytes.
+        constexpr auto BUFFER_SIZE {256};
+
+        /// Stream UDS server connection requests limit.
+        constexpr auto STREAM_SERVER_BACKLOG {5};
+    }
+
     auto StreamUDS::init() noexcept -> VmmResult<None> {
         auto sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
 
@@ -48,6 +56,23 @@ namespace nullvm::service {
             return std::unexpected("Error to bind server address");
 
         return None {};
+    }
+
+    auto StreamUDS::send(i32 fd, const Bytes& data) noexcept
+    -> VmmResult<None> {
+        if (auto ret = write(fd, data.data(), data.size()); ret == -1)
+            return std::unexpected("Error to send data to client");
+
+        return None {};
+    }
+
+    auto StreamUDS::recv(i32 fd) noexcept -> VmmResult<Bytes> {
+        Bytes data {BUFFER_SIZE};
+
+        if (auto ret = read(fd, data.data(), data.size()); ret == -1)
+            return std::unexpected("Error to receive data from client");
+
+        return data;
     }
 
     auto StreamUDS::run() noexcept -> VmmResult<None> {
