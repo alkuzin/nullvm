@@ -9,6 +9,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <source_location>
 #include <string_view>
+#include <stdexcept>
 #include <format>
 #include <print>
 
@@ -127,7 +128,7 @@ namespace nullvm::log {
         custom("PANIC", "On line: {}", loc.line());
         custom("PANIC", fmt.format, std::forward<Args>(args)...);
 
-        std::terminate();
+        throw std::runtime_error("Panic occured");
     }
 
 }
