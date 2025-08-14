@@ -30,6 +30,36 @@ namespace nullvm::service {
         ///
         /// @param [in] type given UDS server type.
         ServerUDS(UDSType type) noexcept;
+
+        /// @brief Initialize ServerUDS object.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto init() noexcept -> VmmResult<None> override;
+
+        /// @brief Send data to client.
+        ///
+        /// @param [in] fd given client connection file descriptor.
+        /// @param [in] data given sequence of bytes to send.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto send(i32 fd, const Bytes& data) noexcept
+        -> VmmResult<None> override;
+
+        /// @brief Receive data from client.
+        ///
+        /// @param [in] fd given client connection file descriptor.
+        ///
+        /// @return Received sequence of bytes - in case of success.
+        /// @return VmmError - otherwise.
+        auto recv(i32 fd) noexcept -> VmmResult<Bytes> override;
+
+        /// @brief Run server.
+        ///
+        /// @return None - in case of success.
+        /// @return VmmError - otherwise.
+        auto run() noexcept -> VmmResult<None> override;
     };
 
 }
