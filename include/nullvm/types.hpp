@@ -9,7 +9,9 @@
 #include <expected>
 #include <variant>
 #include <cstdint>
+#include <cstddef>
 #include <string>
+#include <vector>
 
 namespace nullvm {
 
@@ -41,6 +43,9 @@ namespace nullvm {
 
     /// Placeholder type for VmmResult.
     using None = std::monostate;
+
+    /// Alias for vector of bytes.
+    using Bytes = std::vector<std::byte>;
 
 }
 
