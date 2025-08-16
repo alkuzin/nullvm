@@ -3,8 +3,8 @@
 
 /// Stream unix domain socket (UDS) server related declarations.
 
-#ifndef NULLVM_SERVICE_STREAM_UDS_HPP
-#define NULLVM_SERVICE_STREAM_UDS_HPP
+#ifndef NULLVM_SERVICE_STREAM_SERVER_HPP
+#define NULLVM_SERVICE_STREAM_SERVER_HPP
 
 #include <nullvm/core/utils/fd_wrapper.hpp>
 #include <nullvm/service/server.hpp>
@@ -19,7 +19,7 @@ namespace nullvm::service {
     constexpr auto STREAM_SERVER_PATH {"/tmp/nullvm_stream_server"};
 
     /// Stream UDS server class.
-    class StreamUDS final : public Server {
+    class StreamServer final : public Server {
         /// Socket file descriptor.
         FDWrapper m_sockfd;
         /// Server address.
@@ -66,4 +66,4 @@ namespace nullvm::service {
 
 }
 
-#endif // NULLVM_SERVICE_STREAM_UDS_HPP
+#endif // NULLVM_SERVICE_STREAM_SERVER_HPP

@@ -3,8 +3,8 @@
 
 /// Unix domain socket (UDS) server related declarations.
 
+#include <nullvm/service/stream_server.hpp>
 #include <nullvm/service/server_uds.hpp>
-#include <nullvm/service/stream_uds.hpp>
 #include <nullvm/log.hpp>
 
 namespace nullvm::service {
@@ -15,7 +15,7 @@ namespace nullvm::service {
         switch (type) {
         case UDSType::Stream:
             log::info("Server type is stream UDS");
-            m_inner = std::make_unique<StreamUDS>();
+            m_inner = std::make_unique<StreamServer>();
             break;
 
         case UDSType::Datagram:

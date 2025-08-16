@@ -9,7 +9,7 @@ project(nullvm_service)
 # List of all source files.
 set(SOURCE_FILES
         src/server_uds.cpp
-        src/stream_uds.cpp
+        src/stream_server.cpp
 )
 
 # Create a shared library.
@@ -35,7 +35,7 @@ enable_testing()
 
 set(TESTS_EXECUTABLE nullvm_service_tests)
 set(TESTS_SOURCE_FILES
-        tests/test_stream_uds.cpp
+        tests/test_stream_server.cpp
 )
 
 add_executable(${TESTS_EXECUTABLE} ${TESTS_SOURCE_FILES})

@@ -3,7 +3,7 @@
 
 /// Stream unix domain socket (UDS) server related declarations.
 
-#include <nullvm/service/stream_uds.hpp>
+#include <nullvm/service/stream_server.hpp>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -20,7 +20,7 @@ namespace nullvm::service {
         constexpr auto STREAM_SERVER_BACKLOG {5};
     }
 
-    auto StreamUDS::init() noexcept -> VmmResult<None> {
+    auto StreamServer::init() noexcept -> VmmResult<None> {
         auto sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
 
         if (sockfd == -1)
@@ -48,7 +48,7 @@ namespace nullvm::service {
         return None {};
     }
 
-    auto StreamUDS::link() noexcept -> VmmResult<None> {
+    auto StreamServer::link() noexcept -> VmmResult<None> {
         auto addr = std::bit_cast<sockaddr*>(&m_addr);
         auto ret = bind(m_sockfd.fd(), addr, sizeof(sockaddr_un));
 
@@ -58,7 +58,7 @@ namespace nullvm::service {
         return None {};
     }
 
-    auto StreamUDS::send(i32 fd, const Bytes& data) noexcept
+    auto StreamServer::send(i32 fd, const Bytes& data) noexcept
     -> VmmResult<None> {
         if (auto ret = write(fd, data.data(), data.size()); ret == -1)
             return std::unexpected("Error to send data to client");
@@ -66,7 +66,7 @@ namespace nullvm::service {
         return None {};
     }
 
-    auto StreamUDS::recv(i32 fd) noexcept -> VmmResult<Bytes> {
+    auto StreamServer::recv(i32 fd) noexcept -> VmmResult<Bytes> {
         Bytes data {BUFFER_SIZE};
 
         if (auto ret = read(fd, data.data(), data.size()); ret == -1)
@@ -75,7 +75,7 @@ namespace nullvm::service {
         return data;
     }
 
-    auto StreamUDS::run() noexcept -> VmmResult<None> {
+    auto StreamServer::run() noexcept -> VmmResult<None> {
         for (;;) {
             auto clientfd = accept(m_sockfd.fd(), nullptr, nullptr);
 
