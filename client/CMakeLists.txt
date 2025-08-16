@@ -9,6 +9,7 @@ project(nullvm_client)
 # List of all source files.
 set(SOURCE_FILES
         src/stream_client.cpp
+        src/client_uds.cpp
 )
 
 # Create a shared library.
