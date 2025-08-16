@@ -47,6 +47,14 @@ namespace nullvm {
     /// Alias for vector of bytes.
     using Bytes = std::vector<std::byte>;
 
+    /// Unix domain socket (UDS) communication type enumeration.
+    enum class UDSType: u8 {
+        /// Stream UDS communication type.
+        Stream,
+        /// Datagram UDS communication type.
+        Datagram
+    };
+
 }
 
 #endif // NULLVM_TYPES_HPP

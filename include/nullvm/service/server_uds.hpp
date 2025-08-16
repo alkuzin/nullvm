@@ -12,14 +12,6 @@
 
 namespace nullvm::service {
 
-    /// UDS servers type enumeration.
-    enum class UDSType: u8 {
-        /// Stream UDS server type.
-        Stream,
-        /// Datagram UDS server type.
-        Datagram
-    };
-
     /// UDS server class.
     class ServerUDS final : public Server {
         /// Inner implementation of UDS server.
