@@ -55,3 +55,4 @@ set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -O3")
 # Project subdirectories.
 add_subdirectory(core)
 add_subdirectory(service)
+add_subdirectory(client)
