@@ -10,14 +10,14 @@
 
 using namespace nullvm::service;
 
-TEST(test_stream_server, test_stream_uds_initialization) {
+TEST(test_stream_server, test_stream_server_initialization) {
     auto server = StreamServer();
     auto result = server.init();
 
     EXPECT_TRUE(result.has_value());
 }
 
-TEST(test_stream_server, test_stream_uds_send_data_correct) {
+TEST(test_stream_server, test_stream_server_send_data_correct) {
     auto server = StreamServer();
     auto result = server.init();
     EXPECT_TRUE(result.has_value());
@@ -31,7 +31,7 @@ TEST(test_stream_server, test_stream_uds_send_data_correct) {
     close(fd);
 }
 
-TEST(test_stream_server, test_stream_uds_send_data_incorrect) {
+TEST(test_stream_server, test_stream_server_send_data_incorrect) {
     auto server = StreamServer();
     auto result = server.init();
     EXPECT_TRUE(result.has_value());
@@ -42,7 +42,7 @@ TEST(test_stream_server, test_stream_uds_send_data_incorrect) {
     EXPECT_FALSE(result.has_value());
 }
 
-TEST(test_stream_server, test_stream_uds_recv_data_correct) {
+TEST(test_stream_server, test_stream_server_recv_data_correct) {
     auto server = StreamServer();
     auto result = server.init();
     EXPECT_TRUE(result.has_value());
@@ -54,7 +54,7 @@ TEST(test_stream_server, test_stream_uds_recv_data_correct) {
     close(fd);
 }
 
-TEST(test_stream_server, test_stream_uds_recv_data_incorrect) {
+TEST(test_stream_server, test_stream_server_recv_data_incorrect) {
     auto server = StreamServer();
     auto result = server.init();
     EXPECT_TRUE(result.has_value());

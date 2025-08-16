@@ -8,7 +8,6 @@
 
 #include <nullvm/core/utils/fd_wrapper.hpp>
 #include <nullvm/service/server.hpp>
-#include <nullvm/types.hpp>
 #include <sys/un.h>
 
 namespace nullvm::service {
@@ -26,7 +25,7 @@ namespace nullvm::service {
         sockaddr_un m_addr;
 
     public:
-        /// @brief Initialize StreamUDS object.
+        /// @brief Initialize StreamServer object.
         ///
         /// @return None - in case of success.
         /// @return VmmError - otherwise.
